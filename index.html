@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Volumetric ASCII Christmas Tree</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+
+    <div class="logo-corner">
+      <div class="logo-title">MERRY CHRISTMAS</div>
+      <div class="hud-stats" id="hud-stats">t: 0.00s | voxels: 0 | rot: 0°</div>
+    </div>
+
+    <div class="countdown-corner">
+      <div class="countdown-label">🎄 XMAS COUNTDOWN</div>
+      <div class="countdown-timer" id="countdown-timer">00d 00h 00m 00s</div>
+    </div>
+
+    <audio id="bg-audio" loop preload="auto">
+      <source src="Ariana Grande – Santa Tell Me.mp3" type="audio/mpeg" />
+    </audio>
+
+    <div class="controls">
+      <button id="btn-replay">Replay Build</button>
+      <button id="btn-santa">Santa Flyby</button>
+      <button id="btn-snow">Snow: ON</button>
+      <button id="btn-music">Music: OFF</button>
+      <label class="speed-control">
+        <span>Spin</span>
+        <input
+          type="range"
+          id="spin-speed"
+          min="0"
+          max="2.5"
+          step="0.1"
+          value="0.7"
+        />
+      </label>
+    </div>
+
+    <div class="hint">
+      Drag to rotate 3D camera • Bottom-up volumetric voxel build
+    </div>
+
+    <script src="index.js"></script>
+  </body>
+</html>
