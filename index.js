@@ -24,9 +24,9 @@ let pitchX = 0.08;
 let isDragging = false;
 let lastMouseX = 0;
 let lastMouseY = 0;
-let spinSpeed = 0.7;
+let spinSpeed = 0.6;
 
-const BUILD_DURATION = 7.5;
+const BUILD_DURATION = 8.5;
 let startTime = performance.now();
 let snowEnabled = true;
 let santaActive = false;
@@ -49,8 +49,8 @@ function dot3(a, b) {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-const MIN_Y = -16.0;
-const MAX_Y = 21.5;
+const MIN_Y = -18.5;
+const MAX_Y = 24.5;
 const staticVoxels = [];
 
 function addVoxel(x, y, z, nx, ny, nz, type, extra = {}) {
@@ -71,9 +71,19 @@ function addVoxel(x, y, z, nx, ny, nz, type, extra = {}) {
 function generateTreeVoxels() {
   staticVoxels.length = 0;
 
-  for (let y = -16.0; y <= -9.5; y += 0.55) {
-    const r = 1.65;
-    const steps = 20;
+  for (let gx = -20; gx <= 20; gx += 0.75) {
+    for (let gz = -20; gz <= 20; gz += 0.75) {
+      const distFromCenter = Math.hypot(gx, gz);
+      if (distFromCenter <= 22) {
+        const gy = -18.7 - Math.sin(gx * 0.25) * Math.cos(gz * 0.25) * 0.5;
+        addVoxel(gx, gy, gz, 0, 1, 0, distFromCenter < 14 ? "ground_snow" : "ground_ice", { phase: distFromCenter });
+      }
+    }
+  }
+
+  for (let y = -18.5; y <= -11.0; y += 0.5) {
+    const r = 2.1;
+    const steps = 24;
     for (let i = 0; i < steps; i++) {
       const a = (i / steps) * Math.PI * 2;
       const x = Math.cos(a) * r;
@@ -83,24 +93,25 @@ function generateTreeVoxels() {
   }
 
   const tiers = [
-    { yBottom: -10.8, yTop: -4.2, rBottom: 10.6, rTop: 5.2 },
-    { yBottom: -6.2,  yTop: 0.2,  rBottom: 9.2,  rTop: 4.3 },
-    { yBottom: -1.6,  yTop: 4.6,  rBottom: 7.8,  rTop: 3.4 },
-    { yBottom: 2.8,   yTop: 8.6,  rBottom: 6.3,  rTop: 2.5 },
-    { yBottom: 6.8,   yTop: 12.2, rBottom: 4.8,  rTop: 1.7 },
-    { yBottom: 10.6,  yTop: 15.2, rBottom: 3.4,  rTop: 0.9 },
-    { yBottom: 13.8,  yTop: 17.8, rBottom: 2.0,  rTop: 0.12 }
+    { yBottom: -12.5, yTop: -5.5, rBottom: 13.2, rTop: 6.8 },
+    { yBottom: -7.5,  yTop: -0.5, rBottom: 11.6, rTop: 5.6 },
+    { yBottom: -2.5,  yTop: 4.5,  rBottom: 9.8,  rTop: 4.5 },
+    { yBottom: 2.5,   yTop: 9.5,  rBottom: 8.0,  rTop: 3.5 },
+    { yBottom: 7.5,   yTop: 14.0, rBottom: 6.2,  rTop: 2.6 },
+    { yBottom: 12.0,  yTop: 17.5, rBottom: 4.5,  rTop: 1.8 },
+    { yBottom: 15.5,  yTop: 20.2, rBottom: 2.9,  rTop: 1.0 },
+    { yBottom: 18.5,  yTop: 22.0, rBottom: 1.5,  rTop: 0.15 }
   ];
 
   tiers.forEach((tier, tIdx) => {
-    const yStep = 0.52;
+    const yStep = 0.48;
     for (let y = tier.yBottom; y <= tier.yTop; y += yStep) {
       const t = (y - tier.yBottom) / (tier.yTop - tier.yBottom);
       const baseR = tier.rBottom * (1 - t) + tier.rTop * t;
 
-      if (baseR > 1.8) {
+      if (baseR > 2.0) {
         const innerR = baseR * 0.72;
-        const innerSteps = Math.max(12, Math.floor(innerR * 5));
+        const innerSteps = Math.max(14, Math.floor(innerR * 5.5));
         for (let i = 0; i < innerSteps; i++) {
           const a = (i / innerSteps) * Math.PI * 2;
           addVoxel(
@@ -115,13 +126,13 @@ function generateTreeVoxels() {
         }
       }
 
-      const lobes = 7 + (tIdx % 3);
-      const circumSteps = Math.max(18, Math.floor(baseR * 8.2));
+      const lobes = 8 + (tIdx % 3);
+      const circumSteps = Math.max(22, Math.floor(baseR * 9.0));
       for (let i = 0; i < circumSteps; i++) {
-        const a = (i / circumSteps) * Math.PI * 2 + tIdx * 0.45;
-        const scallop = 1 + 0.14 * Math.sin(a * lobes + y * 0.7) * (1 - t * 0.5);
+        const a = (i / circumSteps) * Math.PI * 2 + tIdx * 0.4;
+        const scallop = 1 + 0.16 * Math.sin(a * lobes + y * 0.65) * (1 - t * 0.45);
         const r = baseR * scallop;
-        const droop = -0.32 * (1 - t) * Math.abs(Math.sin(a * lobes));
+        const droop = -0.38 * (1 - t) * Math.abs(Math.sin(a * lobes));
 
         const x = Math.cos(a) * r;
         const z = Math.sin(a) * r;
@@ -129,38 +140,38 @@ function generateTreeVoxels() {
 
         const nx = Math.cos(a) * 0.85 + 0.2 * Math.cos(a * lobes);
         const nz = Math.sin(a) * 0.85 + 0.2 * Math.sin(a * lobes);
-        const ny = 0.48 - 0.15 * (1 - t);
+        const ny = 0.5 - 0.15 * (1 - t);
 
         addVoxel(x, vy, z, nx, ny, nz, "foliage");
       }
     }
   });
 
-  const garlandSteps = 210;
+  const garlandSteps = 280;
   for (let i = 0; i < garlandSteps; i++) {
     const t = i / garlandSteps;
-    const y = -10.2 + t * 27.2;
-    const coneR = 10.6 * (1 - t * 0.96) + 0.35;
-    const a = t * Math.PI * 2 * 5.2;
+    const y = -11.5 + t * 31.5;
+    const coneR = 13.0 * (1 - t * 0.95) + 0.4;
+    const a = t * Math.PI * 2 * 6.5;
     const x = Math.cos(a) * coneR;
     const z = Math.sin(a) * coneR;
-    addVoxel(x, y, z, Math.cos(a), 0.4, Math.sin(a), "garland", { phase: i * 0.35 });
+    addVoxel(x, y, z, Math.cos(a), 0.4, Math.sin(a), "garland", { phase: i * 0.3 });
   }
 
-  const baubleCount = 46;
+  const baubleCount = 68;
   for (let b = 0; b < baubleCount; b++) {
     const t = (b + 0.5) / baubleCount;
-    const yCenter = -9.8 + t * 25.5;
-    const coneR = 10.4 * (1 - t * 0.93) + 0.45;
+    const yCenter = -11.0 + t * 30.0;
+    const coneR = 12.6 * (1 - t * 0.92) + 0.5;
     const angle = b * 2.39996;
 
-    const bx = Math.cos(angle) * (coneR + 0.25);
-    const bz = Math.sin(angle) * (coneR + 0.25);
+    const bx = Math.cos(angle) * (coneR + 0.3);
+    const bz = Math.sin(angle) * (coneR + 0.3);
     const isRed = b % 3 !== 0;
-    const ballR = 0.68;
+    const ballR = 0.78;
 
-    const latSteps = 5;
-    const lonSteps = 8;
+    const latSteps = 6;
+    const lonSteps = 10;
     for (let la = 0; la <= latSteps; la++) {
       const phi = (la / latSteps) * Math.PI;
       const sinP = Math.sin(phi);
@@ -180,25 +191,26 @@ function generateTreeVoxels() {
           sy,
           sz,
           isRed ? "bauble_red" : "bauble_gold",
-          { phase: b * 0.7 }
+          { phase: b * 0.6 }
         );
       }
     }
   }
 
   const gifts = [
-    { cx: -7.8, cz: 5.2,  sx: 2.3, sy: 1.9, sz: 2.1, rot: 0.35,  boxType: "gift_red",  ribType: "ribbon_gold" },
-    { cx: 8.2,  cz: 4.5,  sx: 2.5, sy: 2.1, sz: 2.3, rot: -0.45, boxType: "gift_blue", ribType: "ribbon_white" },
-    { cx: -6.5, cz: -6.8, sx: 2.1, sy: 1.7, sz: 2.0, rot: 0.7,   boxType: "gift_gold", ribType: "ribbon_red" },
-    { cx: 7.4,  cz: -6.2, sx: 2.0, sy: 2.3, sz: 1.9, rot: -0.25, boxType: "gift_red",  ribType: "ribbon_white" },
-    { cx: 0.8,  cz: 9.2,  sx: 1.8, sy: 1.4, sz: 1.7, rot: 0.18,  boxType: "gift_blue", ribType: "ribbon_gold" }
+    { cx: -9.2, cz: 6.2,  sx: 2.8, sy: 2.3, sz: 2.6, rot: 0.35,  boxType: "gift_red",  ribType: "ribbon_gold" },
+    { cx: 9.8,  cz: 5.5,  sx: 3.1, sy: 2.6, sz: 2.8, rot: -0.45, boxType: "gift_blue", ribType: "ribbon_white" },
+    { cx: -7.8, cz: -8.2, sx: 2.6, sy: 2.1, sz: 2.5, rot: 0.7,   boxType: "gift_gold", ribType: "ribbon_red" },
+    { cx: 8.8,  cz: -7.5, sx: 2.5, sy: 2.8, sz: 2.4, rot: -0.25, boxType: "gift_red",  ribType: "ribbon_white" },
+    { cx: 1.0,  cz: 11.2, sx: 2.3, sy: 1.8, sz: 2.2, rot: 0.18,  boxType: "gift_blue", ribType: "ribbon_gold" },
+    { cx: -4.5, cz: 10.2, sx: 2.2, sy: 2.2, sz: 2.1, rot: -0.6,  boxType: "gift_gold", ribType: "ribbon_blue" }
   ];
 
   gifts.forEach((g) => {
     const cosR = Math.cos(g.rot);
     const sinR = Math.sin(g.rot);
-    const step = 0.44;
-    const baseY = -16.0;
+    const step = 0.42;
+    const baseY = -18.5;
 
     for (let lx = -g.sx; lx <= g.sx; lx += step) {
       for (let ly = 0; ly <= g.sy * 2; ly += step) {
@@ -208,7 +220,7 @@ function generateTreeVoxels() {
           const onZ = Math.abs(Math.abs(lz) - g.sz) < step * 0.65;
           if (!onX && !onYTop && !onZ) continue;
 
-          const isRibbon = Math.abs(lx) < 0.38 || Math.abs(lz) < 0.38;
+          const isRibbon = Math.abs(lx) < 0.42 || Math.abs(lz) < 0.42;
 
           let lnx = 0, lny = 0, lnz = 0;
           if (onYTop) lny = 1;
@@ -235,12 +247,12 @@ function generateTreeVoxels() {
       }
     }
 
-    const bowY = baseY + g.sy * 2 + 0.45;
-    for (let bAngle = 0; bAngle < Math.PI * 2; bAngle += 0.45) {
-      const loopR = 0.65 * Math.abs(Math.sin(bAngle * 2));
+    const bowY = baseY + g.sy * 2 + 0.5;
+    for (let bAngle = 0; bAngle < Math.PI * 2; bAngle += 0.4) {
+      const loopR = 0.75 * Math.abs(Math.sin(bAngle * 2));
       const lx = Math.cos(bAngle) * loopR;
       const lz = Math.sin(bAngle) * loopR * 0.45;
-      const ly = Math.abs(Math.sin(bAngle * 2)) * 0.42;
+      const ly = Math.abs(Math.sin(bAngle * 2)) * 0.48;
 
       const wx = g.cx + lx * cosR - lz * sinR;
       const wz = g.cz + lx * sinR + lz * cosR;
@@ -248,10 +260,10 @@ function generateTreeVoxels() {
     }
   });
 
-  const starY = 19.3;
-  const starOuterR = 2.25;
-  const starInnerR = 0.92;
-  const starDepth = 0.65;
+  const starY = 22.0;
+  const starOuterR = 2.65;
+  const starInnerR = 1.1;
+  const starDepth = 0.75;
 
   for (let side of [-1, 1]) {
     addVoxel(0, starY, side * starDepth, 0, 0, side, "star");
@@ -274,13 +286,13 @@ function generateTreeVoxels() {
 
 function getSantaVoxels(progress, time) {
   const voxels = [];
-  const angle = (progress - 0.5) * Math.PI * 1.45;
-  const orbitR = 17.5;
-  const cx = Math.sin(angle) * orbitR * 1.35;
+  const angle = (progress - 0.5) * Math.PI * 1.5;
+  const orbitR = 19.5;
+  const cx = Math.sin(angle) * orbitR * 1.4;
   const cz = Math.cos(angle) * orbitR;
-  const cy = 6.5 + Math.sin(progress * Math.PI * 2) * 2.2;
+  const cy = 7.5 + Math.sin(progress * Math.PI * 2) * 2.5;
 
-  const dirX = Math.cos(angle) * 1.35;
+  const dirX = Math.cos(angle) * 1.4;
   const dirZ = -Math.sin(angle);
   const hLen = Math.hypot(dirX, dirZ) || 1;
   const fx = dirX / hLen;
@@ -300,63 +312,64 @@ function getSantaVoxels(progress, time) {
     voxels.push({ x: wx, y: wy, z: wz, nx: n.x, ny: n.y, nz: n.z, type });
   }
 
-  for (let f = -2.4; f <= 1.8; f += 0.45) {
-    for (let r = -0.9; r <= 0.9; r += 0.45) {
-      if (Math.abs(Math.abs(r) - 0.9) < 0.25) {
-        const curl = f > 1.2 ? Math.pow(f - 1.2, 2) * 1.4 : 0;
-        addLocalSanta(f, -1.35 + curl, r, 0, -0.5, Math.sign(r), "santa_gold");
+  for (let f = -3.2; f <= 2.2; f += 0.4) {
+    for (let r = -1.2; r <= 1.2; r += 0.4) {
+      if (Math.abs(Math.abs(r) - 1.2) < 0.2) {
+        const curl = f > 1.4 ? Math.pow(f - 1.4, 2) * 1.8 : 0;
+        addLocalSanta(f, -1.6 + curl, r, 0, -0.6, Math.sign(r), "santa_gold");
       }
-      addLocalSanta(f, -0.7, r, 0, 1, 0, "santa_red");
-      if (Math.abs(Math.abs(r) - 0.9) < 0.25) {
-        const wallH = f < -1.2 ? 0.8 : 0.25;
-        for (let u = -0.7; u <= wallH; u += 0.42) {
+      addLocalSanta(f, -0.9, r, 0, 1, 0, "santa_red");
+      if (Math.abs(Math.abs(r) - 1.2) < 0.2) {
+        const wallH = f < -1.6 ? 1.1 : 0.4;
+        for (let u = -0.8; u <= wallH; u += 0.35) {
           addLocalSanta(f, u, r, 0, 0.2, Math.sign(r), "santa_red");
         }
-        addLocalSanta(f, wallH + 0.35, r, 0, 1, Math.sign(r), "santa_gold");
+        addLocalSanta(f, wallH + 0.4, r, 0, 1, Math.sign(r), "santa_gold");
       }
     }
   }
 
-  for (let dy = -0.3; dy <= 0.9; dy += 0.4) {
-    for (let da = 0; da < Math.PI * 2; da += 0.9) {
-      addLocalSanta(-1.3 + Math.cos(da) * 0.55, dy, Math.sin(da) * 0.55, Math.cos(da), 0.3, Math.sin(da), "gift_gold");
+  for (let dy = -0.4; dy <= 1.2; dy += 0.35) {
+    for (let da = 0; da < Math.PI * 2; da += 0.75) {
+      addLocalSanta(-1.9 + Math.cos(da) * 0.75, dy, Math.sin(da) * 0.75, Math.cos(da), 0.3, Math.sin(da), "gift_gold");
     }
   }
-  for (let u = -0.2; u <= 0.8; u += 0.4) {
-    for (let da = 0; da < Math.PI * 2; da += 0.8) {
-      addLocalSanta(0.2 + Math.cos(da) * 0.55, u, Math.sin(da) * 0.55, Math.cos(da), 0.2, Math.sin(da), "santa_red");
+
+  for (let u = -0.3; u <= 1.0; u += 0.35) {
+    for (let da = 0; da < Math.PI * 2; da += 0.7) {
+      addLocalSanta(0.3 + Math.cos(da) * 0.65, u, Math.sin(da) * 0.65, Math.cos(da), 0.2, Math.sin(da), "santa_red");
     }
   }
-  addLocalSanta(0.65, 1.15, 0, 1, 0, 0, "ribbon_white");
-  addLocalSanta(0.25, 1.25, 0, 0, 0.5, 0, "santa_red");
-  addLocalSanta(0.1, 1.65, 0, 0, 1, 0, "santa_red");
-  addLocalSanta(-0.25, 1.75, 0, -1, 0.5, 0, "ribbon_white");
+  addLocalSanta(0.85, 1.3, 0, 1, 0, 0, "ribbon_white");
+  addLocalSanta(0.35, 1.45, 0, 0, 0.5, 0, "santa_red");
+  addLocalSanta(0.2, 1.9, 0, 0, 1, 0, "santa_red");
+  addLocalSanta(-0.35, 2.15, 0, -1, 0.6, 0, "ribbon_white");
 
-  for (let pair = 0; pair < 3; pair++) {
-    const baseFwd = 4.2 + pair * 3.1;
-    const gallop = Math.sin(time * 9 + pair * 1.1) * 0.45;
+  for (let pair = 0; pair < 4; pair++) {
+    const baseFwd = 4.8 + pair * 3.2;
+    const gallop = Math.sin(time * 11 + pair * 1.1) * 0.45;
 
-    for (let rf = 1.8; rf <= baseFwd; rf += 0.7) {
-      addLocalSanta(rf, -0.1 + gallop * 0.25, -0.55, 0, 1, 0, "santa_gold");
-      addLocalSanta(rf, -0.1 + gallop * 0.25, 0.55, 0, 1, 0, "santa_gold");
+    for (let rf = 2.4; rf <= baseFwd; rf += 0.6) {
+      addLocalSanta(rf, -0.1 + gallop * 0.25, -0.7, 0, 1, 0, "santa_gold");
+      addLocalSanta(rf, -0.1 + gallop * 0.25, 0.7, 0, 1, 0, "santa_gold");
     }
 
-    for (let side of [-0.68, 0.68]) {
-      for (let bf = -0.7; bf <= 0.7; bf += 0.42) {
+    for (let side of [-0.82, 0.82]) {
+      for (let bf = -0.8; bf <= 0.8; bf += 0.38) {
         addLocalSanta(baseFwd + bf, 0.0 + gallop, side, 0, 0.8, Math.sign(side) * 0.4, "reindeer");
       }
-      const legSwing = Math.cos(time * 9 + pair * 1.1) * 0.35;
-      addLocalSanta(baseFwd - 0.5 - legSwing, -0.65 + gallop, side, -0.5, -0.5, 0, "reindeer");
-      addLocalSanta(baseFwd + 0.5 + legSwing, -0.65 + gallop, side, 0.5, -0.5, 0, "reindeer");
+      const legSwing = Math.cos(time * 11 + pair * 1.1) * 0.4;
+      addLocalSanta(baseFwd - 0.6 - legSwing, -0.8 + gallop, side, -0.5, -0.5, 0, "reindeer");
+      addLocalSanta(baseFwd + 0.6 + legSwing, -0.8 + gallop, side, 0.5, -0.5, 0, "reindeer");
 
-      addLocalSanta(baseFwd + 0.85, 0.55 + gallop, side, 0.6, 0.6, 0, "reindeer");
-      addLocalSanta(baseFwd + 1.15, 0.85 + gallop, side, 1, 0.3, 0, "reindeer");
+      addLocalSanta(baseFwd + 1.0, 0.6 + gallop, side, 0.6, 0.6, 0, "reindeer");
+      addLocalSanta(baseFwd + 1.4, 1.0 + gallop, side, 1, 0.3, 0, "reindeer");
 
-      addLocalSanta(baseFwd + 0.9, 1.35 + gallop, side - 0.2, 0, 1, -0.4, "santa_gold");
-      addLocalSanta(baseFwd + 0.9, 1.35 + gallop, side + 0.2, 0, 1, 0.4, "santa_gold");
+      addLocalSanta(baseFwd + 1.1, 1.55 + gallop, side - 0.28, 0, 1, -0.5, "santa_gold");
+      addLocalSanta(baseFwd + 1.1, 1.55 + gallop, side + 0.28, 0, 1, 0.5, "santa_gold");
 
-      if (pair === 2 && side > 0) {
-        addLocalSanta(baseFwd + 1.48, 0.85 + gallop, side, 1, 0, 0, "rudolph_nose");
+      if (pair === 3 && side > 0) {
+        addLocalSanta(baseFwd + 1.8, 1.0 + gallop, side, 1, 0, 0, "rudolph_nose");
       }
     }
   }
@@ -365,11 +378,11 @@ function getSantaVoxels(progress, time) {
 }
 
 const snowflakeGlyphs = ["*", "❄", "❅", "❆", "✳", "✶", "·"];
-const snowflakes = Array.from({ length: 120 }, () => ({
-  x: (Math.random() - 0.5) * 58,
-  y: Math.random() * 46 - 20,
-  z: (Math.random() - 0.5) * 58,
-  speed: 1.0 + Math.random() * 2.5,
+const snowflakes = Array.from({ length: 140 }, () => ({
+  x: (Math.random() - 0.5) * 64,
+  y: Math.random() * 50 - 22,
+  z: (Math.random() - 0.5) * 64,
+  speed: 1.1 + Math.random() * 2.8,
   drift: Math.random() * Math.PI * 2,
   glyph: snowflakeGlyphs[Math.floor(Math.random() * snowflakeGlyphs.length)],
   brightness: 0.5 + Math.random() * 0.5
@@ -381,6 +394,13 @@ function shadeVoxel(v, time) {
   const shade = Math.min(1, 0.18 + diff * 0.78 + rim);
 
   switch (v.type) {
+    case "ground_snow": {
+      const idx = Math.min(RAMP_SOLID.length - 1, Math.floor(shade * RAMP_SOLID.length));
+      return { ch: RAMP_SOLID[idx], color: shade > 0.5 ? "#e2e8f0" : "#94a3b8", glow: 0 };
+    }
+    case "ground_ice": {
+      return { ch: ".", color: "#38bdf8", glow: 2 };
+    }
     case "core":
       return { ch: ":", color: "#052e16", glow: 0 };
     case "trunk": {
@@ -430,7 +450,7 @@ function shadeVoxel(v, time) {
       return {
         ch: RAMP_GLOW[idx],
         color: shade > 0.65 ? "#fef9c3" : "#facc15",
-        glow: 14 * pulse
+        glow: 15 * pulse
       };
     }
     case "gift_red": {
@@ -448,10 +468,10 @@ function shadeVoxel(v, time) {
     case "ribbon_gold": return { ch: "#", color: "#fef08a", glow: 4 };
     case "ribbon_white": return { ch: "#", color: "#f8fafc", glow: 3 };
     case "ribbon_red": return { ch: "#", color: "#ff2a4b", glow: 4 };
-    case "santa_red": return { ch: "@", color: shade > 0.45 ? "#ff2a4b" : "#b91c1c", glow: 5 };
-    case "santa_gold": return { ch: "*", color: "#fde047", glow: 6 };
+    case "santa_red": return { ch: "@", color: shade > 0.45 ? "#ff2a4b" : "#b91c1c", glow: 6 };
+    case "santa_gold": return { ch: "*", color: "#fde047", glow: 7 };
     case "reindeer": return { ch: shade > 0.5 ? "#" : "=", color: shade > 0.5 ? "#d97706" : "#92400e", glow: 0 };
-    case "rudolph_nose": return { ch: "@", color: "#ff1e42", glow: 14 };
+    case "rudolph_nose": return { ch: "@", color: "#ff1e42", glow: 16 };
     case "snowflake":
       return { ch: v.glyph, color: v.brightness > 0.75 ? "#ffffff" : "#93c5fd", glow: v.brightness > 0.75 ? 6 : 2 };
     default: return { ch: ".", color: "#cbd5e1", glow: 0 };
@@ -577,7 +597,7 @@ function render(now) {
   }
 
   if (santaActive) {
-    santaProgress += dt * 0.14;
+    santaProgress += dt * 0.13;
     if (santaProgress > 1.15) {
       santaActive = false;
     }
@@ -593,13 +613,13 @@ function render(now) {
 
   const cosY = Math.cos(rotY);
   const sinY = Math.sin(rotY);
-  const cosP = Math.cos(pitchX);                                                                                    
+  const cosP = Math.cos(pitchX);
   const sinP = Math.sin(pitchX);
 
-  const cameraDist = 50
-  const fovScale = Math.min(width, height) * 0.72;
+  const cameraDist = 66;
+  const fovScale = Math.min(width, height) * 0.75;
   const centerX = width * 0.5;
-  const centerY = height * 0.54;
+  const centerY = height * 0.53;
 
   function projectAndPlot(v, applyTreeSpin) {
     let x = v.x;
@@ -673,10 +693,10 @@ function render(now) {
       s.y -= s.speed * dt;
       s.x += Math.sin(elapsed * 1.5 + s.drift) * 0.6 * dt;
       s.z += Math.cos(elapsed * 1.2 + s.drift) * 0.4 * dt;
-      if (s.y < -20) {
-        s.y = 26;
-        s.x = (Math.random() - 0.5) * 58;
-        s.z = (Math.random() - 0.5) * 58;
+      if (s.y < -22) {
+        s.y = 28;
+        s.x = (Math.random() - 0.5) * 64;
+        s.z = (Math.random() - 0.5) * 64;
       }
       projectAndPlot({ x: s.x, y: s.y, z: s.z, nx: 0, ny: 1, nz: 0, type: "snowflake", glyph: s.glyph, brightness: s.brightness }, false);
     }
