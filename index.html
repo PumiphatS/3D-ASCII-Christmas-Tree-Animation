@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<<<<<<< HEAD
     <title>3D Volumetric ASCII Christmas Tree & Santa</title>
+=======
+    <title>3D Volumetric ASCII Christmas Tree, Santa & Snoopy</title>
+>>>>>>> 87f00e2 (Update character toggles and snowy floor)
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
@@ -20,14 +24,56 @@
     </div>
 
     <audio id="bg-audio" loop preload="auto">
-      <source src="Ariana Grande – Santa Tell Me.mp3" type="audio/mpeg" />
+      <source
+        id="audio-source"
+        src="songList/Ariana Grande – Santa Tell Me.mp3"
+        type="audio/mpeg"
+      />
     </audio>
 
     <div class="controls">
       <button id="btn-replay">Replay Build</button>
       <button id="btn-santa">Santa Flyby</button>
+      <button id="btn-snoopy">Snoopy: OFF</button>
+      <button id="btn-pooh">Pooh & Piglet: OFF</button>
       <button id="btn-snow">Snow: ON</button>
+
+      <div class="song-selector">
+        <label for="song-select">Song:</label>
+        <select id="song-select">
+          <option value="santa-tell-me.mp3">Santa Tell Me</option>
+          <option
+            value="songList/Mariah Carey - All I Want For Christmas Is You (Lyrics).mp3"
+          >
+            All I Want For Christmas
+          </option>
+          <option value="songList/Wham - Last Christmas (Lyrics).mp3">
+            Last Christmas
+          </option>
+          <option value="songList/Bobby Helms - Jingle Bell Rock.mp3">
+            Jingle Bell Rock
+          </option>
+
+          <option
+            value="songList/my daisy「 Lyrics Video 」- RISA NARISA - (original Kbps).mp3"
+          >
+            My Daisy
+          </option>
+          <option
+            value="songList/ตกหลุมรักรอบที่ล้าน (love u 1m) 「Official Video」 l Kinkaworn x Bell Warisara - (original Kbps).mp3"
+          >
+            ตกหลุมรักรอบที่ล้าน
+          </option>
+          <option
+            value="songList/เอเวอร์รี่ติง จิงเกอเบล - BALLCHON & Earth Yamamoto x TikTok (Prod. by Wine Neti) _ OFFICIAL MV - (original Kbps).mp3"
+          >
+            เอเวอร์รี่ติง จิงเกอเบล
+          </option>
+        </select>
+      </div>
+
       <button id="btn-music">Music: OFF</button>
+
       <label class="speed-control">
         <span>Spin</span>
         <input
@@ -41,9 +87,15 @@
       </label>
     </div>
 
+<<<<<<< HEAD
     <div class="hint">
       Drag to rotate 3D camera • Grand Scale Volumetric Voxel Build
     </div>
+=======
+    <!-- <div class="hint">
+      Drag to rotate 3D camera • Grand Scale Volumetric Voxel Build
+    </div> -->
+>>>>>>> 87f00e2 (Update character toggles and snowy floor)
 
     <script src="index.js"></script>
   </body>
