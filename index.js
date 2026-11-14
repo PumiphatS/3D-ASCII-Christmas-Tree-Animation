@@ -40,7 +40,60 @@ const selectedCharacters = new Set();
 let santaActive = false;
 let santaProgress = 0;
 let santaAutoTriggered = false;
+
+
 let musicPlaying = false;
+let musicExplicitlyDisabled = false;
+
+
+function updateMusicButton() {
+  musicPlaying = !bgAudio.paused;
+
+  if (musicPlaying) {
+    // Music ON - Green glowing border
+    btnMusic.textContent = "Music: ON";
+    btnMusic.style.borderColor = "#4ade80";
+    btnMusic.style.boxShadow =
+      "0 0 12px rgba(74, 222, 128, 0.45)";
+  } else {
+    // Music OFF - Normal gray border
+    btnMusic.textContent = "Music: OFF";
+    btnMusic.style.borderColor = "rgba(148, 163, 184, 0.25)";
+    btnMusic.style.boxShadow = "none";
+  }
+}
+
+
+async function startChristmasMusic() {
+  if (musicExplicitlyDisabled) return;
+
+  try {
+    await bgAudio.play();
+    updateMusicButton();
+  } catch (error) {
+    updateMusicButton();
+    console.log("Music requires user interaction.");
+  }
+}
+
+bgAudio.volume = 0.5;
+
+bgAudio.addEventListener("play", updateMusicButton);
+bgAudio.addEventListener("pause", updateMusicButton);
+bgAudio.addEventListener("ended", updateMusicButton);
+
+window.addEventListener("load", startChristmasMusic);
+
+function playOnFirstInteraction(event) {
+  if (event.target.closest?.("#btn-music")) return;
+  if (musicExplicitlyDisabled || !bgAudio.paused) return;
+
+  startChristmasMusic();
+}
+
+document.addEventListener("pointerdown", playOnFirstInteraction);
+document.addEventListener("keydown", playOnFirstInteraction);
+
 
 const LIGHT = normalize3({ x: 0.55, y: 0.72, z: 0.65 });
 
@@ -2204,24 +2257,21 @@ btnSnow.addEventListener("click", () => {
   btnSnow.textContent = snowEnabled ? "Snow: ON" : "Snow: OFF";
 });
 
-btnMusic.addEventListener("click", () => {
-  musicPlaying = !musicPlaying;
-  if (musicPlaying) {
-    bgAudio.play().then(() => {
-      btnMusic.textContent = "Music: ON";
-      btnMusic.style.borderColor = "#4ade80";
-      btnMusic.style.boxShadow = "0 0 12px rgba(74, 222, 128, 0.45)";
-    }).catch(err => {
-      console.log("Audio autoplay prevented:", err);
-      musicPlaying = false;
-    });
-  } else {
+
+btnMusic.addEventListener("click", async () => {
+  if (!bgAudio.paused) {
+    // Turn music OFF
+    musicExplicitlyDisabled = true;
     bgAudio.pause();
-    btnMusic.textContent = "Music: OFF";
-    btnMusic.style.borderColor = "rgba(148, 163, 184, 0.25)";
-    btnMusic.style.boxShadow = "none";
+  } else {
+    // Turn music ON
+    musicExplicitlyDisabled = false;
+    await startChristmasMusic();
   }
+
+  updateMusicButton();
 });
+
 
 songSelect.addEventListener("change", (e) => {
   const selectedSong = e.target.value;
@@ -2234,6 +2284,15 @@ songSelect.addEventListener("change", (e) => {
 
 spinSlider.addEventListener("input", (e) => {
   spinSpeed = parseFloat(e.target.value);
+});
+
+document.addEventListener("wonderland:enter", () => {
+  // Restart the Christmas tree animation
+  startTime = performance.now();
+
+  // Start the music after clicking Enter
+  musicExplicitlyDisabled = false;
+  startChristmasMusic();
 });
 
 function updateCountdown() {

@@ -37,7 +37,7 @@
       <div class="countdown-timer" id="countdown-timer">00d 00h 00m 00s</div>
     </div>
 
-    <audio id="bg-audio" loop preload="auto">
+    <audio id="bg-audio" autoplay loop preload="auto">
       <source
         id="audio-source"
         src="songList/Ariana Grande – Santa Tell Me.mp3"
@@ -86,7 +86,9 @@
       <div class="song-selector">
         <label for="song-select">Song:</label>
         <select id="song-select">
-          <option value="santa-tell-me.mp3">Santa Tell Me</option>
+          <option value="songList/Ariana Grande – Santa Tell Me.mp3">
+            Santa Tell Me
+          </option>
           <option
             value="songList/Mariah Carey - All I Want For Christmas Is You (Lyrics).mp3"
           >
@@ -137,5 +139,6 @@
     </div> -->
 
     <script src="index.js"></script>
+    <script src="welcomeGate.js"></script>
   </body>
 </html>
