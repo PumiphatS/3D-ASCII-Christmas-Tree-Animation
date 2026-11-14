@@ -78,14 +78,6 @@ function addVoxel(x, y, z, nx, ny, nz, type, extra = {}) {
 function generateTreeVoxels() {
   staticVoxels.length = 0;
 
-<<<<<<< HEAD
-  for (let gx = -20; gx <= 20; gx += 0.75) {
-    for (let gz = -20; gz <= 20; gz += 0.75) {
-      const distFromCenter = Math.hypot(gx, gz);
-      if (distFromCenter <= 22) {
-        const gy = -18.7 - Math.sin(gx * 0.25) * Math.cos(gz * 0.25) * 0.5;
-        addVoxel(gx, gy, gz, 0, 1, 0, distFromCenter < 14 ? "ground_snow" : "ground_ice", { phase: distFromCenter });
-=======
   
   // Natural snowy winter floor
   for (let gx = -40; gx <= 40; gx += 0.5) {
@@ -125,21 +117,14 @@ function generateTreeVoxels() {
           isIce ? "ground_ice" : "ground_snow",
           { phase: gx * 0.17 + gz * 0.11 }
         );
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
       }
     }
   }
 
-<<<<<<< HEAD
-  for (let y = -18.5; y <= -11.0; y += 0.5) {
-    const r = 2.1;
-    const steps = 24;
-=======
 
   for (let y = -18.5; y <= -11.0; y += 0.22) {
     const r = 2.15;
     const steps = 48;
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
     for (let i = 0; i < steps; i++) {
       const a = (i / steps) * Math.PI * 2;
       const barkRidge = 1 + 0.06 * Math.sin(a * 14 + y * 1.5);
@@ -150,20 +135,6 @@ function generateTreeVoxels() {
   }
 
   const tiers = [
-<<<<<<< HEAD
-    { yBottom: -12.5, yTop: -5.5, rBottom: 13.2, rTop: 6.8 },
-    { yBottom: -7.5,  yTop: -0.5, rBottom: 11.6, rTop: 5.6 },
-    { yBottom: -2.5,  yTop: 4.5,  rBottom: 9.8,  rTop: 4.5 },
-    { yBottom: 2.5,   yTop: 9.5,  rBottom: 8.0,  rTop: 3.5 },
-    { yBottom: 7.5,   yTop: 14.0, rBottom: 6.2,  rTop: 2.6 },
-    { yBottom: 12.0,  yTop: 17.5, rBottom: 4.5,  rTop: 1.8 },
-    { yBottom: 15.5,  yTop: 20.2, rBottom: 2.9,  rTop: 1.0 },
-    { yBottom: 18.5,  yTop: 22.0, rBottom: 1.5,  rTop: 0.15 }
-  ];
-
-  tiers.forEach((tier, tIdx) => {
-    const yStep = 0.48;
-=======
     { yBottom: -12.5, yTop: -5.5, rBottom: 13.5, rTop: 7.0 },
     { yBottom: -7.5,  yTop: -0.5, rBottom: 11.8, rTop: 5.8 },
     { yBottom: -2.5,  yTop: 4.5,  rBottom: 10.0, rTop: 4.6 },
@@ -176,20 +147,13 @@ function generateTreeVoxels() {
 
   tiers.forEach((tier, tIdx) => {
     const yStep = 0.22;
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
     for (let y = tier.yBottom; y <= tier.yTop; y += yStep) {
       const t = (y - tier.yBottom) / (tier.yTop - tier.yBottom);
       const baseR = tier.rBottom * (1 - t) + tier.rTop * t;
 
-<<<<<<< HEAD
-      if (baseR > 2.0) {
-        const innerR = baseR * 0.72;
-        const innerSteps = Math.max(14, Math.floor(innerR * 5.5));
-=======
       if (baseR > 1.3) {
         const innerR = baseR * 0.8;
         const innerSteps = Math.max(24, Math.floor(innerR * 11.0));
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
         for (let i = 0; i < innerSteps; i++) {
           const a = (i / innerSteps) * Math.PI * 2;
           addVoxel(
@@ -204,13 +168,8 @@ function generateTreeVoxels() {
         }
       }
 
-<<<<<<< HEAD
-      const lobes = 8 + (tIdx % 3);
-      const circumSteps = Math.max(22, Math.floor(baseR * 9.0));
-=======
       const lobes = 10 + (tIdx % 3);
       const circumSteps = Math.max(42, Math.floor(baseR * 18.0));
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
       for (let i = 0; i < circumSteps; i++) {
         const a = (i / circumSteps) * Math.PI * 2 + tIdx * 0.4;
         const scallop = 1 + 0.16 * Math.sin(a * lobes + y * 0.65) * (1 - t * 0.45);
@@ -230,24 +189,6 @@ function generateTreeVoxels() {
     }
   });
 
-<<<<<<< HEAD
-  const garlandSteps = 280;
-  for (let i = 0; i < garlandSteps; i++) {
-    const t = i / garlandSteps;
-    const y = -11.5 + t * 31.5;
-    const coneR = 13.0 * (1 - t * 0.95) + 0.4;
-    const a = t * Math.PI * 2 * 6.5;
-    const x = Math.cos(a) * coneR;
-    const z = Math.sin(a) * coneR;
-    addVoxel(x, y, z, Math.cos(a), 0.4, Math.sin(a), "garland", { phase: i * 0.3 });
-  }
-
-  const baubleCount = 68;
-  for (let b = 0; b < baubleCount; b++) {
-    const t = (b + 0.5) / baubleCount;
-    const yCenter = -11.0 + t * 30.0;
-    const coneR = 12.6 * (1 - t * 0.92) + 0.5;
-=======
   const garlandSteps = 620;
   for (let i = 0; i < garlandSteps; i++) {
     const t = i / garlandSteps;
@@ -265,23 +206,15 @@ function generateTreeVoxels() {
     const t = (b + 0.5) / baubleCount;
     const yCenter = -11.0 + t * 30.0;
     const coneR = 12.8 * (1 - t * 0.92) + 0.5;
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
     const angle = b * 2.39996;
 
     const bx = Math.cos(angle) * (coneR + 0.3);
     const bz = Math.sin(angle) * (coneR + 0.3);
     const isRed = b % 3 !== 0;
-<<<<<<< HEAD
-    const ballR = 0.78;
-
-    const latSteps = 6;
-    const lonSteps = 10;
-=======
     const ballR = 0.85;
 
     const latSteps = 12;
     const lonSteps = 18;
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
     for (let la = 0; la <= latSteps; la++) {
       const phi = (la / latSteps) * Math.PI;
       const sinP = Math.sin(phi);
@@ -308,30 +241,17 @@ function generateTreeVoxels() {
   }
 
   const gifts = [
-<<<<<<< HEAD
-    { cx: -9.2, cz: 6.2,  sx: 2.8, sy: 2.3, sz: 2.6, rot: 0.35,  boxType: "gift_red",  ribType: "ribbon_gold" },
-    { cx: 9.8,  cz: 5.5,  sx: 3.1, sy: 2.6, sz: 2.8, rot: -0.45, boxType: "gift_blue", ribType: "ribbon_white" },
-    { cx: -7.8, cz: -8.2, sx: 2.6, sy: 2.1, sz: 2.5, rot: 0.7,   boxType: "gift_gold", ribType: "ribbon_red" },
-    { cx: 8.8,  cz: -7.5, sx: 2.5, sy: 2.8, sz: 2.4, rot: -0.25, boxType: "gift_red",  ribType: "ribbon_white" },
-    { cx: 1.0,  cz: 11.2, sx: 2.3, sy: 1.8, sz: 2.2, rot: 0.18,  boxType: "gift_blue", ribType: "ribbon_gold" },
-    { cx: -4.5, cz: 10.2, sx: 2.2, sy: 2.2, sz: 2.1, rot: -0.6,  boxType: "gift_gold", ribType: "ribbon_blue" }
-=======
     { cx: -7.5, cz: -6.8, sx: 2.6, sy: 2.1, sz: 2.5, rot: 0.35,  boxType: "gift_red",  ribType: "ribbon_gold" },
     { cx: 9.8,  cz: 5.5,  sx: 3.1, sy: 2.6, sz: 2.8, rot: -0.45, boxType: "gift_blue", ribType: "ribbon_white" },
     { cx: 8.8,  cz: -7.5, sx: 2.5, sy: 2.8, sz: 2.4, rot: -0.25, boxType: "gift_red",  ribType: "ribbon_white" },
     { cx: 2.5,  cz: 11.2, sx: 2.3, sy: 1.8, sz: 2.2, rot: 0.18,  boxType: "gift_blue", ribType: "ribbon_gold" },
     { cx: 5.5,  cz: 9.2,  sx: 2.2, sy: 2.2, sz: 2.1, rot: -0.6,  boxType: "gift_gold", ribType: "ribbon_blue" }
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
   ];
 
   gifts.forEach((g) => {
     const cosR = Math.cos(g.rot);
     const sinR = Math.sin(g.rot);
-<<<<<<< HEAD
-    const step = 0.42;
-=======
     const step = 0.2;
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
     const baseY = -18.5;
 
     for (let lx = -g.sx; lx <= g.sx; lx += step) {
@@ -342,11 +262,7 @@ function generateTreeVoxels() {
           const onZ = Math.abs(Math.abs(lz) - g.sz) < step * 0.65;
           if (!onX && !onYTop && !onZ) continue;
 
-<<<<<<< HEAD
-          const isRibbon = Math.abs(lx) < 0.42 || Math.abs(lz) < 0.42;
-=======
           const isRibbon = Math.abs(lx) < 0.35 || Math.abs(lz) < 0.35;
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
 
           let lnx = 0, lny = 0, lnz = 0;
           if (onYTop) lny = 1;
@@ -373,14 +289,6 @@ function generateTreeVoxels() {
       }
     }
 
-<<<<<<< HEAD
-    const bowY = baseY + g.sy * 2 + 0.5;
-    for (let bAngle = 0; bAngle < Math.PI * 2; bAngle += 0.4) {
-      const loopR = 0.75 * Math.abs(Math.sin(bAngle * 2));
-      const lx = Math.cos(bAngle) * loopR;
-      const lz = Math.sin(bAngle) * loopR * 0.45;
-      const ly = Math.abs(Math.sin(bAngle * 2)) * 0.48;
-=======
     const bowY = baseY + g.sy * 2 + 0.32;
     for (let bAngle = 0; bAngle < Math.PI * 2; bAngle += 0.18) {
       const loopR = 0.88 * Math.abs(Math.sin(bAngle * 2));
@@ -388,7 +296,6 @@ function generateTreeVoxels() {
         const lx = Math.cos(bAngle) * loopR * radScale;
         const lz = Math.sin(bAngle) * loopR * 0.48 * radScale;
         const ly = Math.abs(Math.sin(bAngle * 2)) * 0.55 * radScale;
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
 
         const wx = g.cx + lx * cosR - lz * sinR;
         const wz = g.cz + lx * sinR + lz * cosR;
@@ -397,17 +304,10 @@ function generateTreeVoxels() {
     }
   });
 
-<<<<<<< HEAD
-  const starY = 22.0;
-  const starOuterR = 2.65;
-  const starInnerR = 1.1;
-  const starDepth = 0.75;
-=======
   const starY = 22.1;
   const starOuterR = 2.95;
   const starInnerR = 1.2;
   const starDepth = 0.85;
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
 
   for (let side of [-1, 1]) {
     addVoxel(0, starY, side * starDepth, 0, 0, side, "star");
@@ -734,21 +634,6 @@ function getSantaVoxels(progress, time) {
     voxels.push({ x: wx, y: wy, z: wz, nx: n.x, ny: n.y, nz: n.z, type });
   }
 
-<<<<<<< HEAD
-  for (let f = -3.2; f <= 2.2; f += 0.4) {
-    for (let r = -1.2; r <= 1.2; r += 0.4) {
-      if (Math.abs(Math.abs(r) - 1.2) < 0.2) {
-        const curl = f > 1.4 ? Math.pow(f - 1.4, 2) * 1.8 : 0;
-        addLocalSanta(f, -1.6 + curl, r, 0, -0.6, Math.sign(r), "santa_gold");
-      }
-      addLocalSanta(f, -0.9, r, 0, 1, 0, "santa_red");
-      if (Math.abs(Math.abs(r) - 1.2) < 0.2) {
-        const wallH = f < -1.6 ? 1.1 : 0.4;
-        for (let u = -0.8; u <= wallH; u += 0.35) {
-          addLocalSanta(f, u, r, 0, 0.2, Math.sign(r), "santa_red");
-        }
-        addLocalSanta(f, wallH + 0.4, r, 0, 1, Math.sign(r), "santa_gold");
-=======
   for (let f = -3.4; f <= 2.3; f += 0.18) {
     for (let r = -1.25; r <= 1.25; r += 0.18) {
       if (Math.abs(Math.abs(r) - 1.22) < 0.12) {
@@ -762,28 +647,10 @@ function getSantaVoxels(progress, time) {
           addLocalSanta(f, u, r, 0, 0.2, Math.sign(r), "santa_red");
         }
         addLocalSanta(f, wallH + 0.25, r, 0, 1, Math.sign(r), "santa_gold");
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
       }
     }
   }
 
-<<<<<<< HEAD
-  for (let dy = -0.4; dy <= 1.2; dy += 0.35) {
-    for (let da = 0; da < Math.PI * 2; da += 0.75) {
-      addLocalSanta(-1.9 + Math.cos(da) * 0.75, dy, Math.sin(da) * 0.75, Math.cos(da), 0.3, Math.sin(da), "gift_gold");
-    }
-  }
-
-  for (let u = -0.3; u <= 1.0; u += 0.35) {
-    for (let da = 0; da < Math.PI * 2; da += 0.7) {
-      addLocalSanta(0.3 + Math.cos(da) * 0.65, u, Math.sin(da) * 0.65, Math.cos(da), 0.2, Math.sin(da), "santa_red");
-    }
-  }
-  addLocalSanta(0.85, 1.3, 0, 1, 0, 0, "ribbon_white");
-  addLocalSanta(0.35, 1.45, 0, 0, 0.5, 0, "santa_red");
-  addLocalSanta(0.2, 1.9, 0, 0, 1, 0, "santa_red");
-  addLocalSanta(-0.35, 2.15, 0, -1, 0.6, 0, "ribbon_white");
-=======
   for (let dy = -0.4; dy <= 1.3; dy += 0.18) {
     for (let da = 0; da < Math.PI * 2; da += 0.35) {
       addLocalSanta(-1.95 + Math.cos(da) * 0.82, dy, Math.sin(da) * 0.82, Math.cos(da), 0.3, Math.sin(da), "gift_gold");
@@ -806,39 +673,16 @@ function getSantaVoxels(progress, time) {
     }
   }
   addLocalSanta(-0.35, 2.22, 0, -1, 0.6, 0, "ribbon_white");
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
 
   for (let pair = 0; pair < 4; pair++) {
     const baseFwd = 4.8 + pair * 3.2;
     const gallop = Math.sin(time * 11 + pair * 1.1) * 0.45;
 
-<<<<<<< HEAD
-    for (let rf = 2.4; rf <= baseFwd; rf += 0.6) {
-=======
     for (let rf = 2.4; rf <= baseFwd; rf += 0.3) {
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
       addLocalSanta(rf, -0.1 + gallop * 0.25, -0.7, 0, 1, 0, "santa_gold");
       addLocalSanta(rf, -0.1 + gallop * 0.25, 0.7, 0, 1, 0, "santa_gold");
     }
 
-<<<<<<< HEAD
-    for (let side of [-0.82, 0.82]) {
-      for (let bf = -0.8; bf <= 0.8; bf += 0.38) {
-        addLocalSanta(baseFwd + bf, 0.0 + gallop, side, 0, 0.8, Math.sign(side) * 0.4, "reindeer");
-      }
-      const legSwing = Math.cos(time * 11 + pair * 1.1) * 0.4;
-      addLocalSanta(baseFwd - 0.6 - legSwing, -0.8 + gallop, side, -0.5, -0.5, 0, "reindeer");
-      addLocalSanta(baseFwd + 0.6 + legSwing, -0.8 + gallop, side, 0.5, -0.5, 0, "reindeer");
-
-      addLocalSanta(baseFwd + 1.0, 0.6 + gallop, side, 0.6, 0.6, 0, "reindeer");
-      addLocalSanta(baseFwd + 1.4, 1.0 + gallop, side, 1, 0.3, 0, "reindeer");
-
-      addLocalSanta(baseFwd + 1.1, 1.55 + gallop, side - 0.28, 0, 1, -0.5, "santa_gold");
-      addLocalSanta(baseFwd + 1.1, 1.55 + gallop, side + 0.28, 0, 1, 0.5, "santa_gold");
-
-      if (pair === 3 && side > 0) {
-        addLocalSanta(baseFwd + 1.8, 1.0 + gallop, side, 1, 0, 0, "rudolph_nose");
-=======
     for (let side of [-0.85, 0.85]) {
       for (let bf = -0.85; bf <= 0.85; bf += 0.18) {
         for (let a = 0; a < Math.PI * 2; a += 0.7) {
@@ -863,7 +707,6 @@ function getSantaVoxels(progress, time) {
 
       if (pair === 3 && side > 0) {
         addLocalSanta(baseFwd + 1.82, 1.02 + gallop, side, 1, 0, 0, "rudolph_nose");
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
       }
     }
   }
@@ -1112,17 +955,10 @@ function getPoohAndPigletVoxels(time) {
 }
 
 const snowflakeGlyphs = ["*", "❄", "❅", "❆", "✳", "✶", "·"];
-<<<<<<< HEAD
-const snowflakes = Array.from({ length: 140 }, () => ({
-  x: (Math.random() - 0.5) * 64,
-  y: Math.random() * 50 - 22,
-  z: (Math.random() - 0.5) * 64,
-=======
 const snowflakes = Array.from({ length: 200 }, () => ({
   x: (Math.random() - 0.5) * 72,
   y: Math.random() * 55 - 22,
   z: (Math.random() - 0.5) * 72,
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
   speed: 1.1 + Math.random() * 2.8,
   drift: Math.random() * Math.PI * 2,
   glyph: snowflakeGlyphs[Math.floor(Math.random() * snowflakeGlyphs.length)],
@@ -1135,15 +971,6 @@ function shadeVoxel(v, time) {
   const shade = Math.min(1, 0.18 + diff * 0.78 + rim);
 
   switch (v.type) {
-<<<<<<< HEAD
-    case "ground_snow": {
-      const idx = Math.min(RAMP_SOLID.length - 1, Math.floor(shade * RAMP_SOLID.length));
-      return { ch: RAMP_SOLID[idx], color: shade > 0.5 ? "#e2e8f0" : "#94a3b8", glow: 0 };
-    }
-    case "ground_ice": {
-      return { ch: ".", color: "#38bdf8", glow: 2 };
-    }
-=======
 
     case "ground_snow": {
     const sparkle = Math.sin(v.phase * 5 + time * 0.25);
@@ -1163,7 +990,6 @@ function shadeVoxel(v, time) {
     };
     }
 
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
     case "core":
       return { ch: ":", color: "#052e16", glow: 0 };
     case "trunk": {
@@ -1213,11 +1039,7 @@ function shadeVoxel(v, time) {
       return {
         ch: RAMP_GLOW[idx],
         color: shade > 0.65 ? "#fef9c3" : "#facc15",
-<<<<<<< HEAD
-        glow: 15 * pulse
-=======
         glow: 13 * pulse
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
       };
     }
 
@@ -1272,13 +1094,6 @@ function shadeVoxel(v, time) {
       const idx = Math.min(RAMP_SOLID.length - 1, Math.floor(shade * RAMP_SOLID.length));
       return { ch: RAMP_SOLID[idx], color: shade > 0.65 ? "#fde047" : shade > 0.38 ? "#eab308" : "#854d0e", glow: 0 };
     }
-<<<<<<< HEAD
-    case "ribbon_gold": return { ch: "#", color: "#fef08a", glow: 4 };
-    case "ribbon_white": return { ch: "#", color: "#f8fafc", glow: 3 };
-    case "ribbon_red": return { ch: "#", color: "#ff2a4b", glow: 4 };
-    case "santa_red": return { ch: "@", color: shade > 0.45 ? "#ff2a4b" : "#b91c1c", glow: 6 };
-    case "santa_gold": return { ch: "*", color: "#fde047", glow: 7 };
-=======
     case "ribbon_gold": return { ch: "#", color: "#fef08a", glow: 3 };
     case "ribbon_white": return { ch: "#", color: "#f8fafc", glow: 2 };
     case "ribbon_red": return { ch: "#", color: "#ff2a4b", glow: 3 };
@@ -1297,9 +1112,8 @@ function shadeVoxel(v, time) {
     }
     case "santa_red": return { ch: "@", color: shade > 0.45 ? "#ff2a4b" : "#b91c1c", glow: 5 };
     case "santa_gold": return { ch: "*", color: "#fde047", glow: 6 };
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
     case "reindeer": return { ch: shade > 0.5 ? "#" : "=", color: shade > 0.5 ? "#d97706" : "#92400e", glow: 0 };
-    case "rudolph_nose": return { ch: "@", color: "#ff1e42", glow: 16 };
+    case "rudolph_nose": return { ch: "@", color: "#ff1e42", glow: 14 };
     case "snowflake":
       return { ch: v.glyph, color: v.brightness > 0.75 ? "#ffffff" : "#93c5fd", glow: v.brightness > 0.75 ? 5 : 1 };
     default: return { ch: ".", color: "#cbd5e1", glow: 0 };
@@ -1473,11 +1287,7 @@ function render(now) {
   const sinP = Math.sin(pitchX);
 
   const cameraDist = 66;
-<<<<<<< HEAD
-  const fovScale = Math.min(width, height) * 0.75;
-=======
   const fovScale = Math.min(width, height) * 0.78;
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
   const centerX = width * 0.5;
   const centerY = height * 0.53;
 
@@ -1573,13 +1383,8 @@ function render(now) {
       s.z += Math.cos(elapsed * 1.2 + s.drift) * 0.4 * dt;
       if (s.y < -22) {
         s.y = 28;
-<<<<<<< HEAD
-        s.x = (Math.random() - 0.5) * 64;
-        s.z = (Math.random() - 0.5) * 64;
-=======
         s.x = (Math.random() - 0.5) * 72;
         s.z = (Math.random() - 0.5) * 72;
->>>>>>> 87f00e2 (Update character toggles and snowy floor)
       }
       projectAndPlot({ x: s.x, y: s.y, z: s.z, nx: 0, ny: 1, nz: 0, type: "snowflake", glyph: s.glyph, brightness: s.brightness }, false);
     }
