@@ -248,61 +248,102 @@ function generateTreeVoxels() {
     { cx: 5.5,  cz: 9.2,  sx: 2.2, sy: 2.2, sz: 2.1, rot: -0.6,  boxType: "gift_gold", ribType: "ribbon_blue" }
   ];
 
-  gifts.forEach((g) => {
-    const cosR = Math.cos(g.rot);
-    const sinR = Math.sin(g.rot);
-    const step = 0.2;
-    const baseY = -18.5;
+gifts.forEach((g) => {
+  const cosR = Math.cos(g.rot);
+  const sinR = Math.sin(g.rot);
+  const baseY = -18.5;
+  const step = 0.12;
 
-    for (let lx = -g.sx; lx <= g.sx; lx += step) {
-      for (let ly = 0; ly <= g.sy * 2; ly += step) {
-        for (let lz = -g.sz; lz <= g.sz; lz += step) {
-          const onX = Math.abs(Math.abs(lx) - g.sx) < step * 0.65;
-          const onYTop = Math.abs(ly - g.sy * 2) < step * 0.65;
-          const onZ = Math.abs(Math.abs(lz) - g.sz) < step * 0.65;
-          if (!onX && !onYTop && !onZ) continue;
+  // Generate evenly spaced coordinates, including both endpoints.
+  const makeRange = (min, max, spacing) => {
+    const count = Math.ceil((max - min) / spacing);
+    return Array.from(
+      { length: count + 1 },
+      (_, i) => min + (max - min) * (i / count)
+    );
+  };
 
-          const isRibbon = Math.abs(lx) < 0.35 || Math.abs(lz) < 0.35;
+  const xs = makeRange(-g.sx, g.sx, step);
+  const ys = makeRange(0, g.sy * 2, step);
+  const zs = makeRange(-g.sz, g.sz, step);
 
-          let lnx = 0, lny = 0, lnz = 0;
-          if (onYTop) lny = 1;
-          else if (onX) lnx = Math.sign(lx);
-          else if (onZ) lnz = Math.sign(lz);
+  // Rotate local coordinates and normals into world coordinates.
+  const addGiftVoxel = (lx, ly, lz, lnx, lny, lnz) => {
+    const wx = g.cx + lx * cosR - lz * sinR;
+    const wz = g.cz + lx * sinR + lz * cosR;
+    const wy = baseY + ly;
 
-          const wx = g.cx + lx * cosR - lz * sinR;
-          const wz = g.cz + lx * sinR + lz * cosR;
-          const wy = baseY + ly;
+    const wnx = lnx * cosR - lnz * sinR;
+    const wnz = lnx * sinR + lnz * cosR;
 
-          const wnx = lnx * cosR - lnz * sinR;
-          const wnz = lnx * sinR + lnz * cosR;
+    const isRibbon =
+      Math.abs(lx) < 0.35 || Math.abs(lz) < 0.35;
 
-          addVoxel(
-            wx,
-            wy,
-            wz,
-            wnx,
-            lny,
-            wnz,
-            isRibbon ? g.ribType : g.boxType
-          );
-        }
-      }
+    addVoxel(
+      wx,
+      wy,
+      wz,
+      wnx,
+      lny,
+      wnz,
+      isRibbon ? g.ribType : g.boxType
+    );
+  };
+
+  // Front face (+Z)
+  for (const lx of xs) {
+    for (const ly of ys) {
+      addGiftVoxel(lx, ly, g.sz, 0, 0, 1);
     }
+  }
 
-    const bowY = baseY + g.sy * 2 + 0.32;
-    for (let bAngle = 0; bAngle < Math.PI * 2; bAngle += 0.18) {
-      const loopR = 0.88 * Math.abs(Math.sin(bAngle * 2));
-      for (let radScale = 0.35; radScale <= 1.0; radScale += 0.25) {
-        const lx = Math.cos(bAngle) * loopR * radScale;
-        const lz = Math.sin(bAngle) * loopR * 0.48 * radScale;
-        const ly = Math.abs(Math.sin(bAngle * 2)) * 0.55 * radScale;
-
-        const wx = g.cx + lx * cosR - lz * sinR;
-        const wz = g.cz + lx * sinR + lz * cosR;
-        addVoxel(wx, bowY + ly, wz, 0, 1, 0, g.ribType);
-      }
+  // Back face (-Z)
+  for (const lx of xs) {
+    for (const ly of ys) {
+      addGiftVoxel(lx, ly, -g.sz, 0, 0, -1);
     }
-  });
+  }
+
+  // Right face (+X)
+  for (const lz of zs) {
+    for (const ly of ys) {
+      addGiftVoxel(g.sx, ly, lz, 1, 0, 0);
+    }
+  }
+
+  // Left face (-X)
+  for (const lz of zs) {
+    for (const ly of ys) {
+      addGiftVoxel(-g.sx, ly, lz, -1, 0, 0);
+    }
+  }
+
+  // Top face (+Y)
+  for (const lx of xs) {
+    for (const lz of zs) {
+      addGiftVoxel(lx, g.sy * 2, lz, 0, 1, 0);
+    }
+  }
+
+  // Gift bow
+  const bowY = baseY + g.sy * 2 + 0.32;
+
+  for (let bAngle = 0; bAngle < Math.PI * 2; bAngle += 0.12) {
+    const loopR = 0.88 * Math.abs(Math.sin(bAngle * 2));
+
+    for (let radScale = 0.25; radScale <= 1.0; radScale += 0.15) {
+      const lx = Math.cos(bAngle) * loopR * radScale;
+      const lz = Math.sin(bAngle) * loopR * 0.48 * radScale;
+      const ly = Math.abs(Math.sin(bAngle * 2)) * 0.55 * radScale;
+
+      const wx = g.cx + lx * cosR - lz * sinR;
+      const wz = g.cz + lx * sinR + lz * cosR;
+
+      addVoxel(wx, bowY + ly, wz, 0, 1, 0, g.ribType);
+    }
+  }
+});
+
 
   const starY = 22.1;
   const starOuterR = 2.95;
