@@ -4,8 +4,8 @@ const hudStats = document.getElementById("hud-stats");
 
 const btnReplay = document.getElementById("btn-replay");
 const btnSanta = document.getElementById("btn-santa");
-const btnSnoopy = document.getElementById("btn-snoopy");
-const btnPooh = document.getElementById("btn-pooh");
+const btnCharacters = document.getElementById("btn-characters");
+const characterMenu = document.getElementById("character-menu");
 const btnSnow = document.getElementById("btn-snow");
 const btnMusic = document.getElementById("btn-music");
 const bgAudio = document.getElementById("bg-audio");
@@ -13,14 +13,15 @@ const audioSource = document.getElementById("audio-source");
 const songSelect = document.getElementById("song-select");
 const spinSlider = document.getElementById("spin-speed");
 const countdownEl = document.getElementById("countdown-timer");
+const christmasTitle = document.getElementById("christmas-title");
 
 let width = 0;
 let height = 0;
 let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
 // Ultra-Fine Terminal ASCII Matrix for Maximum Sharpness matching reference style
-const CELL_W = 3.8;
-const CELL_H = 6.8;
+const CELL_W = 3.2;
+const CELL_H = 5.8;
 let cols = 0;
 let rows = 0;
 
@@ -34,8 +35,8 @@ let spinSpeed = 0.6;
 const BUILD_DURATION = 8.5;
 let startTime = performance.now();
 let snowEnabled = true;
-let snoopyEnabled = false;
-let poohEnabled = false;
+// Characters are independently selectable from the Pop Characters menu.
+const selectedCharacters = new Set();
 let santaActive = false;
 let santaProgress = 0;
 let santaAutoTriggered = false;
@@ -568,6 +569,64 @@ function getSnoopyAndWoodstockVoxels(time) {
     }
   }
 
+
+  // SNOOPY: extra facial definition
+
+  // Rounder white cheeks
+  for (const side of [-1, 1]) {
+    for (let a = 0; a < Math.PI * 2; a += 0.24) {
+      addS(
+        0.6 + Math.cos(a) * 0.52,
+        headCenterY - 0.65 + Math.sin(a) * 0.46,
+        side * 1.13,
+        Math.cos(a), Math.sin(a), side,
+        "snoopy_white"
+      );
+    }
+  }
+
+  // More prominent black oval nose
+  for (let a = 0; a < Math.PI * 2; a += 0.18) {
+    addS(
+      3.58,
+      headCenterY + 0.3 + Math.sin(a) * 0.35,
+      Math.cos(a) * 0.4,
+      1, Math.sin(a), Math.cos(a),
+      "snoopy_black"
+    );
+  }
+
+  // Curved smile visible on both sides
+  for (const side of [-1, 1]) {
+    for (let i = 0; i <= 16; i++) {
+      const t = i / 16;
+
+      addS(
+        0.75 + t * 1.65,
+        headCenterY - 0.85 - Math.sin(t * Math.PI) * 0.17,
+        side * (1.17 - t * 0.15),
+        0, -0.2, side,
+        "snoopy_black"
+      );
+    }
+  }
+
+  // Small black eyebrow details
+  for (const side of [-1, 1]) {
+    for (let i = 0; i <= 6; i++) {
+      const t = i / 6;
+
+      addS(
+        0.85 + t * 0.35,
+        headCenterY + 1.46 + Math.sin(t * Math.PI) * 0.1,
+        side * 1.08,
+        0, 1, side,
+        "snoopy_black"
+      );
+    }
+  }
+
+
   const wx0 = sx0 + 4.8;
   const wz0 = sz0 + 2.4;
   const woodHop = Math.abs(Math.cos(playBeat * 1.4)) * 1.3;
@@ -617,6 +676,78 @@ function getSnoopyAndWoodstockVoxels(time) {
       addW(0.1, 1.35 + wingFlap * wi, side * (0.65 + wi * 0.55), 0, 0.5, side, "woodstock_yellow");
     }
   }
+
+
+  // WOODSTOCK: spiky cartoon silhouette
+
+  // Distinctive zigzag feather crest
+  const featherTips = [
+    [-0.75, 3.25],
+    [-0.55, 3.9],
+    [-0.2, 3.45],
+    [0.05, 4.05],
+    [0.28, 3.48],
+    [0.58, 3.85],
+    [0.7, 3.2]
+  ];
+
+  for (const [fx, fy] of featherTips) {
+    const rootX = fx * 0.55;
+
+    for (let i = 0; i <= 10; i++) {
+      const t = i / 10;
+
+      addW(
+        rootX + (fx - rootX) * t,
+        2.85 + (fy - 2.85) * t,
+        0,
+        fx, 1, 0,
+        "woodstock_yellow"
+      );
+    }
+  }
+
+  // Fuller yellow head
+  for (let a = 0; a < Math.PI * 2; a += 0.2) {
+    addW(
+      Math.cos(a) * 0.93,
+      2.35 + Math.sin(a) * 0.85,
+      0.12,
+      Math.cos(a), Math.sin(a), 0.3,
+      "woodstock_yellow"
+    );
+  }
+
+  // Tiny pointed beak
+  for (let i = 0; i <= 8; i++) {
+    const t = i / 8;
+
+    addW(
+      -0.8 - t * 0.65,
+      2.18 + t * 0.08,
+      0,
+      -1, 0, 0,
+      "woodstock_yellow"
+    );
+  }
+
+  // Thin black eyes
+  addW(-0.58, 2.52, 0.56, -0.2, 0.2, 1, "snoopy_black");
+  addW(-0.58, 2.52, -0.56, -0.2, 0.2, -1, "snoopy_black");
+
+  // Small three-feather tail
+  for (let i = -1; i <= 1; i++) {
+    for (let t = 0; t <= 1; t += 0.15) {
+      addW(
+        0.45 + t * 0.9,
+        0.95 + i * 0.22 + t * 0.25,
+        0,
+        1, i * 0.3, 0,
+        "woodstock_yellow"
+      );
+    }
+  }
+
 
   const ballT = (Math.sin(playBeat) + 1) * 0.5;
   const bx = wx0 - 1.2 - ballT * 2.2;
@@ -756,7 +887,7 @@ function getSantaVoxels(progress, time) {
 }
 
 
-function getPoohAndPigletVoxels(time) {
+function getPoohAndPigletVoxels(time, showPooh, showPiglet) {
   const voxels = [];
   const groundY = -18.5;
   const play = time * 3.2;
@@ -833,34 +964,42 @@ function getPoohAndPigletVoxels(time) {
     }
 
     // Body and shirt
-    ellipsoid(
-      0, 3.45, 0,
-      isPiglet ? 1.05 : 1.55,
-      isPiglet ? 1.35 : 1.8,
-      isPiglet ? 0.9 : 1.25,
-      body
-    );
+    
+    // More accurate body proportions and clothing
+    if (isPiglet) {
+      // Small pear-shaped pink body
+      ellipsoid(0, 3.3, 0, 0.94, 1.42, 0.78, "piglet_pink");
 
-    if (!isPiglet) {
-      ellipsoid(0, 4.25, 0, 1.62, 0.92, 1.28, shirt);
-    } else {
-      // Piglet's striped outfit
-      for (let yy = 3.0; yy <= 4.5; yy += 0.42) {
-        const rx = 1.05 * Math.sqrt(
-          Math.max(0.1, 1 - Math.pow((yy - 3.45) / 1.4, 2))
+      // Magenta striped jumper
+      ellipsoid(0, 3.65, 0.06, 1.02, 1.05, 0.85, "piglet_stripe");
+
+      // Thin horizontal pink stripes
+      for (let yy = 3.0; yy <= 4.45; yy += 0.34) {
+        const rx = 1.04 * Math.sqrt(
+          Math.max(0.12, 1 - ((yy - 3.65) / 1.08) ** 2)
         );
 
-        for (let a = 0; a < Math.PI * 2; a += 0.18) {
+        for (let a = 0; a < Math.PI * 2; a += 0.14) {
           add(
-            Math.cos(a) * rx,
+            Math.cos(a) * rx * 1.02,
             yy,
-            Math.sin(a) * 0.9,
+            0.06 + Math.sin(a) * 0.87,
             Math.cos(a), 0, Math.sin(a),
-            "piglet_stripe"
+            "piglet_pink"
           );
         }
       }
+    } else {
+      // Pooh's round, golden belly
+      ellipsoid(0, 3.15, 0, 1.78, 1.78, 1.45, "pooh_yellow");
+
+      // His short red shirt, only on the upper torso
+      ellipsoid(0, 4.55, -0.05, 1.52, 0.82, 1.28, "pooh_red");
+
+      // Golden belly protrudes below the shirt
+      ellipsoid(0, 2.9, 0.65, 1.38, 1.1, 0.96, "pooh_yellow");
     }
+
 
     // Legs and feet
     for (const side of [-1, 1]) {
@@ -931,6 +1070,47 @@ function getPoohAndPigletVoxels(time) {
       );
     }
 
+
+    // Character-specific facial details
+    if (isPiglet) {
+      // Tall, tapered forehead
+      ellipsoid(0, 8.15, -0.1, 0.93, 0.95, 0.82, "piglet_pink");
+
+      // Longer, upward-pointing snout
+      ellipsoid(0, 7.0, 1.35, 0.48, 0.33, 0.48, "piglet_snout");
+
+      // Tiny nose
+      ellipsoid(0, 7.05, 1.78, 0.17, 0.13, 0.09, "pooh_dark");
+
+      // Eyebrows
+      for (const side of [-1, 1]) {
+        tube(
+          side * 0.34, 8.04, 1.02,
+          side * 0.62, 8.12, 0.91,
+          0.055, "pooh_dark"
+        );
+      }
+    } else {
+      // Pooh's rounded cheeks
+      for (const side of [-1, 1]) {
+        ellipsoid(
+          side * 0.87, 6.75, 0.95,
+          0.48, 0.45, 0.36, "pooh_yellow"
+        );
+
+        // Slightly raised eyebrows
+        tube(
+          side * 0.38, 7.99, 1.18,
+          side * 0.7, 8.05, 1.02,
+          0.065, "pooh_dark"
+        );
+      }
+
+      // A wider, gentle smile
+      tube(-0.48, 6.52, 1.38, 0, 6.39, 1.5, 0.06, "pooh_dark");
+      tube(0, 6.39, 1.5, 0.48, 6.52, 1.38, 0.06, "pooh_dark");
+    }
+
     // Moving arms
     for (const side of [-1, 1]) {
       const lift = armSwing * (side === 1 ? 1 : -0.7);
@@ -958,11 +1138,12 @@ function getPoohAndPigletVoxels(time) {
     }
   }
 
-  // Pooh on the left, Piglet on the right
-  makeCharacter(22.5, 5.0, 1.0, false, 0);
-  makeCharacter(32.0, 5.8, 0.78, true, 1.2);
+  // Pooh and Piglet can now be displayed independently.
+  if (showPooh) makeCharacter(22.5, 5.0, 1.0, false, 0);
+  if (showPiglet) makeCharacter(32.0, 5.8, 0.78, true, 1.2);
 
-  // Snowball moving between them
+  // Their snowball appears only when both characters are visible.
+  if (showPooh && showPiglet) {
   const toss = (Math.sin(play * 0.75) + 1) * 0.5;
 
   const ballX = 25.0 + toss * 5.3;
@@ -991,6 +1172,662 @@ function getPoohAndPigletVoxels(time) {
       });
     }
   }
+
+  }
+  return voxels;
+}
+
+function getHundredAcreFriendsVoxels(time, selected) {
+  const voxels = [];
+  const groundY = -18.5;
+
+  // Shared voxel helpers for all four characters.
+  function makeFriend(cx, cz, scale, kind, phase) {
+    const cycle = time * (kind === "tigger" ? 5.2 : 2.8) + phase;
+
+    let bob = 0;
+    let sway = 0;
+
+    if (kind === "tigger") {
+      bob = Math.abs(Math.sin(cycle)) * 1.8;
+      sway = Math.sin(cycle) * 0.35;
+    } else if (kind === "eeyore") {
+      bob = Math.sin(cycle * 0.65) * 0.12;
+      sway = Math.sin(cycle * 0.6) * 0.18;
+    } else if (kind === "kanga") {
+      bob = Math.sin(cycle) * 0.18;
+      sway = Math.sin(cycle * 0.7) * 0.12;
+    } else {
+      bob = Math.abs(Math.sin(cycle * 1.4)) * 1.0;
+      sway = Math.sin(cycle * 1.4) * 0.35;
+    }
+
+    const colors = {
+      tigger: "tigger_orange",
+      eeyore: "eeyore_blue",
+      kanga: "kanga_brown",
+      roo: "roo_brown"
+    };
+
+    const bodyType = colors[kind];
+
+    function add(x, y, z, nx, ny, nz, type) {
+      const n = normalize3({ x: nx, y: ny, z: nz });
+
+      voxels.push({
+        x: cx + (x + sway) * scale,
+        y: groundY + (y + bob) * scale,
+        z: cz + z * scale,
+        nx: n.x,
+        ny: n.y,
+        nz: n.z,
+        type
+      });
+    }
+
+    function ellipsoid(x, y, z, rx, ry, rz, type, step = 0.22) {
+      const latSteps = Math.ceil(Math.PI / step);
+      const lonSteps = Math.ceil((Math.PI * 2) / step);
+
+      for (let lat = 0; lat <= latSteps; lat++) {
+        const phi = (lat / latSteps) * Math.PI;
+
+        for (let lon = 0; lon < lonSteps; lon++) {
+          const theta = (lon / lonSteps) * Math.PI * 2;
+
+          const nx = Math.sin(phi) * Math.cos(theta);
+          const ny = Math.cos(phi);
+          const nz = Math.sin(phi) * Math.sin(theta);
+
+          add(
+            x + nx * rx,
+            y + ny * ry,
+            z + nz * rz,
+            nx, ny, nz,
+            type
+          );
+        }
+      }
+    }
+
+    function tube(ax, ay, az, bx, by, bz, radius, type) {
+      const dx = bx - ax;
+      const dy = by - ay;
+      const dz = bz - az;
+      const len = Math.hypot(dx, dy, dz) || 1;
+      const steps = Math.ceil(len / 0.15);
+
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+
+        ellipsoid(
+          ax + dx * t,
+          ay + dy * t,
+          az + dz * t,
+          radius,
+          radius,
+          radius,
+          type,
+          0.45
+        );
+      }
+    }
+
+    // ------------------------------------------------
+    // TIGGER: bouncing tiger with moving arms and tail
+    // ------------------------------------------------
+    if (kind === "tigger") {
+      // Body and belly
+      ellipsoid(0, 3.6, 0, 1.35, 1.8, 1.05, "tigger_orange");
+      ellipsoid(0, 3.65, 0.78, 0.92, 1.3, 0.35, "tigger_belly");
+
+      
+      // Angled black tiger stripes on both sides
+      for (const side of [-1, 1]) {
+        for (let i = 0; i < 5; i++) {
+          const y = 2.55 + i * 0.52;
+          const z = -0.25 + (i % 2) * 0.12;
+
+          tube(
+            side * 1.27, y, z - 0.45,
+            side * 0.98, y + 0.33, z + 0.47,
+            0.11, "tigger_stripe"
+          );
+        }
+      }
+
+      // Legs and feet
+      for (const side of [-1, 1]) {
+        const legSwing = Math.sin(cycle + side) * 0.55;
+
+        tube(
+          side * 0.7, 2.5, 0,
+          side * 0.85 + legSwing, 0.65, 0.12,
+          0.38, "tigger_orange"
+        );
+
+        ellipsoid(
+          side * 0.85 + legSwing, 0.48, 0.35,
+          0.58, 0.3, 0.55,
+          "tigger_belly"
+        );
+      }
+
+      // Head
+      ellipsoid(0, 7.0, 0, 1.5, 1.55, 1.25, "tigger_orange");
+      ellipsoid(0, 6.55, 1.0, 0.85, 0.55, 0.42, "tigger_belly");
+
+      // Ears
+      for (const side of [-1, 1]) {
+        ellipsoid(side * 1.15, 8.15, 0, 0.48, 0.62, 0.35, "tigger_orange");
+        ellipsoid(side * 1.15, 8.18, 0.27, 0.25, 0.35, 0.12, "tigger_belly");
+      }
+
+      // Eyes and nose
+      for (const side of [-1, 1]) {
+        ellipsoid(side * 0.55, 7.35, 1.08, 0.15, 0.2, 0.12, "friend_dark");
+      }
+
+      ellipsoid(0, 6.75, 1.42, 0.2, 0.16, 0.12, "friend_dark");
+
+      // Moving arms waving during the bounce
+      for (const side of [-1, 1]) {
+        const armMove = Math.sin(cycle * 1.4 + side) * 0.8;
+
+        tube(
+          side * 1.05, 5.0, 0,
+          side * 1.9, 6.0 + armMove, 0.2,
+          0.35, "tigger_orange"
+        );
+
+        ellipsoid(
+          side * 1.9, 6.0 + armMove, 0.2,
+          0.38, 0.38, 0.38,
+          "tigger_belly"
+        );
+      }
+
+      // Long, curved, moving tiger tail
+      const tailWag = Math.sin(time * 7) * 0.9;
+
+      for (let i = 0; i <= 14; i++) {
+        const t = i / 14;
+
+        const tx = -0.8 - t * 2.2;
+        const ty = 3.0 + t * 2.1 + Math.sin(t * Math.PI) * 0.7;
+        const tz = tailWag * t;
+
+        ellipsoid(tx, ty, tz, 0.18, 0.18, 0.18, "tigger_orange", 0.7);
+
+        if (i % 3 === 0) {
+          ellipsoid(tx, ty, tz, 0.2, 0.2, 0.2, "tigger_stripe", 0.7);
+        }
+      }
+
+      // Black stripes on the forehead
+      for (let i = -1; i <= 1; i++) {
+        ellipsoid(i * 0.38, 8.05, 0.75, 0.12, 0.42, 0.12, "tigger_stripe");
+      }
+
+
+      // Angled black tiger stripes on both sides
+      for (const side of [-1, 1]) {
+        for (let i = 0; i < 5; i++) {
+          const y = 2.55 + i * 0.52;
+          const z = -0.25 + (i % 2) * 0.12;
+
+          tube(
+            side * 1.27, y, z - 0.45,
+            side * 0.98, y + 0.33, z + 0.47,
+            0.11, "tigger_stripe"
+          );
+        }
+      }
+    }
+
+    // ---------------------------------------------
+    // EEYORE: slow walking with a swaying tail
+    // ---------------------------------------------
+    
+if (kind === "eeyore") {
+  // Horizontal donkey body
+  ellipsoid(0, 3.3, -0.45, 1.38, 1.25, 2.45, "eeyore_blue");
+  ellipsoid(0, 2.7, 0.3, 0.98, 0.62, 1.52, "eeyore_belly");
+  ellipsoid(0, 3.62, 1.3, 1.18, 1.22, 0.94, "eeyore_blue");
+
+  // Four legs with gray hooves
+  for (const z of [-1.92, 1.26]) {
+    for (const side of [-1, 1]) {
+      const phaseShift =
+        (z > 0 ? 0 : Math.PI) +
+        (side > 0 ? 0 : Math.PI);
+
+      const step = Math.sin(cycle * 0.8 + phaseShift) * 0.17;
+
+      tube(
+        side * 0.88, 2.75, z,
+        side * (0.94 + step), 0.55, z + step,
+        0.36, "eeyore_blue"
+      );
+
+      ellipsoid(
+        side * (0.94 + step),
+        0.35,
+        z + 0.18 + step,
+        0.47, 0.33, 0.58,
+        "eeyore_hoof"
+      );
+    }
+  }
+
+  // Sloping neck
+  tube(
+    0, 3.72, 1.42,
+    0, 5.45, 2.25,
+    0.75, "eeyore_blue"
+  );
+
+  // Head and long muzzle
+  ellipsoid(0, 5.95, 2.25, 1.05, 1.18, 0.95, "eeyore_blue");
+  ellipsoid(0, 5.35, 3.02, 0.89, 0.75, 0.7, "eeyore_muzzle");
+  ellipsoid(0, 5.08, 3.55, 0.82, 0.42, 0.3, "eeyore_muzzle");
+
+  // Eyes, eyelids, nostrils
+  for (const side of [-1, 1]) {
+    ellipsoid(
+      side * 0.49, 6.17, 2.98,
+      0.17, 0.18, 0.12,
+      "friend_dark"
+    );
+
+    // Sleepy upper eyelid
+    tube(
+      side * 0.23, 6.33, 3.04,
+      side * 0.7, 6.36, 2.91,
+      0.09, "eeyore_mane"
+    );
+
+    // Eye highlight
+    ellipsoid(
+      side * 0.47, 6.19, 3.09,
+      0.05, 0.06, 0.04,
+      "friend_white"
+    );
+
+    // Nostrils
+    ellipsoid(
+      side * 0.42, 5.17, 3.79,
+      0.14, 0.1, 0.07,
+      "friend_dark"
+    );
+  }
+
+  // Sad curved mouth
+  tube(
+    -0.45, 4.92, 3.75,
+    0, 4.84, 3.82,
+    0.065, "eeyore_mane"
+  );
+  tube(
+    0, 4.84, 3.82,
+    0.45, 4.92, 3.75,
+    0.065, "eeyore_mane"
+  );
+
+  // Long drooping ears
+  for (const side of [-1, 1]) {
+    tube(
+      side * 0.65, 6.8, 2.12,
+      side * 1.72, 7.25, 2.05,
+      0.24, "eeyore_blue"
+    );
+
+    ellipsoid(
+      side * 1.9, 7.03, 2.07,
+      0.94, 0.24, 0.38,
+      "eeyore_blue"
+    );
+
+    // Pink inner ear
+    ellipsoid(
+      side * 1.9, 7.03, 2.39,
+      0.72, 0.13, 0.12,
+      "eeyore_ear"
+    );
+  }
+
+  // Short black mane
+  for (let i = 0; i < 9; i++) {
+    const z = 1.25 + i * 0.19;
+    const y = 5.55 + i * 0.17;
+
+    tube(
+      0, y, z,
+      0, y + 0.35, z - 0.12,
+      0.13, "eeyore_mane"
+    );
+  }
+
+  // Tail with black tuft
+  const wag = Math.sin(time * 1.8) * 0.2;
+
+  tube(
+    0, 3.2, -2.7,
+    wag * 0.7, 1.8, -3.1,
+    0.15, "eeyore_blue"
+  );
+
+  ellipsoid(
+    wag * 0.7, 1.65, -3.19,
+    0.25, 0.55, 0.28,
+    "eeyore_mane"
+  );
+
+  // Pink bow
+  ellipsoid(
+    -0.3 + wag * 0.7, 2.04, -3.05,
+    0.33, 0.19, 0.17,
+    "eeyore_bow"
+  );
+
+  ellipsoid(
+    0.3 + wag * 0.7, 2.04, -3.05,
+    0.33, 0.19, 0.17,
+    "eeyore_bow"
+  );
+
+  ellipsoid(
+    wag * 0.7, 2.04, -2.9,
+    0.13, 0.13, 0.13,
+    "eeyore_bow"
+  );
+}
+
+
+    // ---------------------------------------------
+    // KANGA: gentle rocking, holding her pouch
+    // ---------------------------------------------
+    if (kind === "kanga") {
+      // Body
+      ellipsoid(0, 3.65, 0, 1.45, 1.75, 1.1, "kanga_brown");
+
+      // Belly
+      ellipsoid(0, 3.7, 0.82, 1.0, 1.25, 0.38, "kanga_belly");
+
+      // Red scarf / clothing
+      ellipsoid(0, 5.0, 0.1, 1.25, 0.48, 0.95, "kanga_red");
+
+      // Legs
+      for (const side of [-1, 1]) {
+        tube(
+          side * 0.75, 2.5, 0,
+          side * 0.9, 0.55, 0.12,
+          0.38, "kanga_brown"
+        );
+
+        ellipsoid(
+          side * 0.9, 0.42, 0.35,
+          0.55, 0.3, 0.55,
+          "kanga_brown"
+        );
+      }
+
+      // Head and muzzle
+      ellipsoid(0, 7.1, 0, 1.35, 1.45, 1.1, "kanga_brown");
+      ellipsoid(0, 6.65, 0.92, 0.85, 0.55, 0.4, "kanga_belly");
+
+      // Long kangaroo ears
+      for (const side of [-1, 1]) {
+        tube(
+          side * 0.65, 8.0, 0,
+          side * 0.9, 10.0, 0,
+          0.28, "kanga_brown"
+        );
+
+        ellipsoid(
+          side * 0.9, 10.0, 0,
+          0.32, 0.6, 0.25,
+          "kanga_ear"
+        );
+      }
+
+      // Eyes and nose
+      for (const side of [-1, 1]) {
+        ellipsoid(
+          side * 0.48, 7.45, 0.95,
+          0.13, 0.17, 0.1,
+          "friend_dark"
+        );
+      }
+
+      ellipsoid(0, 6.75, 1.3, 0.18, 0.15, 0.12, "friend_dark");
+
+      // Pouch held in front
+      ellipsoid(
+        0, 2.9, 1.12,
+        0.9, 0.78, 0.4,
+        "kanga_pouch"
+      );
+
+      // Arms resting around the pouch
+      for (const side of [-1, 1]) {
+        const armMove = Math.sin(cycle + side) * 0.12;
+
+        tube(
+          side * 1.0, 5.1, 0.1,
+          side * 0.65, 3.4 + armMove, 1.0,
+          0.3, "kanga_brown"
+        );
+      }
+
+      // Tail
+      tube(
+        -1.2, 2.5, -0.2,
+        -2.2, 1.8, -0.4,
+        0.2, "kanga_brown"
+      );
+
+
+      // Long kangaroo muzzle
+      ellipsoid(0, 6.52, 1.22, 0.72, 0.43, 0.67, "kanga_belly");
+
+      // Small dark nose
+      ellipsoid(0, 6.62, 1.83, 0.23, 0.16, 0.13, "friend_dark");
+
+      // Rounded cheeks and eyebrows
+      for (const side of [-1, 1]) {
+        ellipsoid(
+          side * 0.75, 6.78, 0.9,
+          0.34, 0.36, 0.25, "kanga_brown"
+        );
+
+        tube(
+          side * 0.25, 7.72, 1.0,
+          side * 0.62, 7.78, 0.88,
+          0.06, "friend_dark"
+        );
+      }
+
+      // Clearly defined pouch opening
+      for (let i = 0; i <= 18; i++) {
+        const a = Math.PI * (i / 18);
+        add(
+          Math.cos(a) * 0.82,
+          3.2 - Math.sin(a) * 0.18,
+          1.53,
+          0, 0, 1,
+          "kanga_brown"
+        );
+      }
+
+      // Strong kangaroo thighs and long hind feet
+      for (const side of [-1, 1]) {
+        ellipsoid(
+          side * 1.02, 1.72, -0.2,
+          0.64, 0.95, 0.78, "kanga_brown"
+        );
+
+        ellipsoid(
+          side * 1.02, 0.27, 0.95,
+          0.57, 0.24, 1.12, "kanga_brown"
+        );
+      }
+
+      // Long balancing tail extending behind
+      tube(
+        0, 2.7, -0.9,
+        0, 1.0, -3.35,
+        0.35, "kanga_brown"
+      );
+
+      ellipsoid(0, 0.85, -3.55, 0.34, 0.3, 0.6, "kanga_brown");
+
+    }
+
+
+
+    // ---------------------------------------------
+    // ROO: small joey hopping beside Kanga
+    // ---------------------------------------------
+    if (kind === "roo") {
+      // Body
+      ellipsoid(0, 2.8, 0, 0.9, 1.15, 0.75, "roo_brown");
+      ellipsoid(0, 2.8, 0.6, 0.58, 0.82, 0.25, "roo_belly");
+
+      // Legs
+      for (const side of [-1, 1]) {
+        const legMove = Math.sin(cycle + side) * 0.55;
+
+        tube(
+          side * 0.48, 2.0, 0,
+          side * 0.65 + legMove, 0.35, 0.15,
+          0.25, "roo_brown"
+        );
+
+        ellipsoid(
+          side * 0.65 + legMove, 0.25, 0.35,
+          0.4, 0.22, 0.4,
+          "roo_brown"
+        );
+      }
+
+      // Head
+      ellipsoid(0, 5.4, 0, 1.0, 1.1, 0.85, "roo_brown");
+      ellipsoid(0, 5.1, 0.72, 0.58, 0.38, 0.3, "roo_belly");
+
+      // Ears
+      for (const side of [-1, 1]) {
+        const earMove = Math.sin(cycle * 2 + side) * 0.16;
+
+        tube(
+          side * 0.42, 6.1, 0,
+          side * 0.65, 7.5 + earMove, 0,
+          0.2, "roo_brown"
+        );
+
+        ellipsoid(
+          side * 0.65, 7.5 + earMove, 0,
+          0.23, 0.42, 0.2,
+          "roo_ear"
+        );
+      }
+
+      // Eyes and nose
+      for (const side of [-1, 1]) {
+        ellipsoid(
+          side * 0.35, 5.7, 0.75,
+          0.1, 0.14, 0.08,
+          "friend_dark"
+        );
+      }
+
+      ellipsoid(0, 5.25, 1.05, 0.13, 0.12, 0.1, "friend_dark");
+
+      // Arms raised while hopping
+      for (const side of [-1, 1]) {
+        const armMove = Math.sin(cycle * 1.5 + side) * 0.45;
+
+        tube(
+          side * 0.7, 4.0, 0,
+          side * 1.25, 5.1 + armMove, 0.1,
+          0.22, "roo_brown"
+        );
+
+        ellipsoid(
+          side * 1.25, 5.1 + armMove, 0.1,
+          0.25, 0.25, 0.25,
+          "roo_brown"
+        );
+      }
+
+      // Small tail
+      tube(
+        -0.65, 2.6, -0.2,
+        -1.25, 2.1, -0.3,
+        0.12, "roo_brown"
+      );
+
+
+      // Large, rounded joey cheeks
+      for (const side of [-1, 1]) {
+        ellipsoid(
+          side * 0.58, 5.08, 0.7,
+          0.36, 0.34, 0.32, "roo_belly"
+        );
+
+        // Eyebrows
+        tube(
+          side * 0.2, 5.99, 0.82,
+          side * 0.48, 6.04, 0.75,
+          0.055, "friend_dark"
+        );
+      }
+
+      // Projecting kangaroo muzzle
+      ellipsoid(0, 5.08, 0.98, 0.48, 0.31, 0.48, "roo_belly");
+      ellipsoid(0, 5.23, 1.39, 0.16, 0.12, 0.1, "friend_dark");
+
+      // Oversized hind feet
+      for (const side of [-1, 1]) {
+        ellipsoid(
+          side * 0.69, 0.24, 0.75,
+          0.45, 0.23, 0.76, "roo_brown"
+        );
+      }
+
+      // Small curved tail
+      tube(
+        0, 2.4, -0.65,
+        0, 1.25, -2.0,
+        0.22, "roo_brown"
+      );
+
+      // Pink inner ear detail
+      for (const side of [-1, 1]) {
+        ellipsoid(
+          side * 0.65, 7.5, 0.18,
+          0.14, 0.3, 0.09, "roo_ear"
+        );
+      }
+
+    }
+  }
+
+  // Positions around the Christmas tree.
+  // The characters face toward the front of the scene.
+  
+  if (selected.has("tigger"))
+    makeFriend(-25, -9, 1.2, "tigger", 0);
+
+  if (selected.has("eeyore"))
+    makeFriend(0, 22, 1.25, "eeyore", 1.5);
+
+  if (selected.has("kanga"))
+    makeFriend(25, -17, 1.17, "kanga", 2.5);
+
+  if (selected.has("roo"))
+    makeFriend(31, -17, 0.9, "roo", 3.5);
+
 
   return voxels;
 }
@@ -1157,6 +1994,117 @@ function shadeVoxel(v, time) {
     case "rudolph_nose": return { ch: "@", color: "#ff1e42", glow: 14 };
     case "snowflake":
       return { ch: v.glyph, color: v.brightness > 0.75 ? "#ffffff" : "#93c5fd", glow: v.brightness > 0.75 ? 5 : 1 };
+    
+        // Tigger
+    case "tigger_orange":
+      return {
+        ch: shade > 0.55 ? "@" : RAMP_SOLID[
+          Math.min(RAMP_SOLID.length - 1,
+            Math.floor(shade * RAMP_SOLID.length))
+        ],
+        color: shade > 0.45 ? "#fb923c" : "#c2410c",
+        glow: 2
+      };
+
+    case "tigger_belly":
+      return { ch: "@", color: "#fed7aa", glow: 1 };
+
+    case "tigger_stripe":
+      return { ch: "#", color: "#292524", glow: 0 };
+
+    // Eeyore
+    case "eeyore_blue":
+      return {
+        ch: shade > 0.55 ? "@" : "+",
+        color: shade > 0.45 ? "#94a3b8" : "#475569",
+        glow: 1
+      };
+
+    case "eeyore_belly":
+      return { ch: ".", color: "#cbd5e1", glow: 0 };
+
+    case "eeyore_muzzle":
+      return { ch: "@", color: "#64748b", glow: 0 };
+
+      case "eeyore_ear":
+    return {
+      ch: "@",
+      color: "#d68b9e",
+      glow: 1
+    };
+
+    case "eeyore_bow":
+      return { ch: "*", color: "#f9a8d4", glow: 3 };
+
+    // Kanga
+    case "kanga_brown":
+      return {
+        ch: shade > 0.55 ? "@" : RAMP_SOLID[
+          Math.min(RAMP_SOLID.length - 1,
+            Math.floor(shade * RAMP_SOLID.length))
+        ],
+        color: shade > 0.45 ? "#a16207" : "#713f12",
+        glow: 1
+      };
+
+    case "kanga_belly":
+      return { ch: "@", color: "#fcd9a5", glow: 1 };
+
+    case "kanga_red":
+      return { ch: "#", color: "#dc2626", glow: 2 };
+
+    case "kanga_pouch":
+      return { ch: "U", color: "#f97316", glow: 2 };
+
+    case "kanga_ear":
+      return { ch: "^", color: "#fca5a5", glow: 1 };
+
+    // Roo
+    case "roo_brown":
+      return {
+        ch: shade > 0.55 ? "@" : "+",
+        color: shade > 0.45 ? "#d6a66b" : "#92400e",
+        glow: 1
+      };
+
+    case "roo_belly":
+      return { ch: "@", color: "#fde0b5", glow: 1 };
+
+    case "roo_ear":
+      return { ch: "^", color: "#fca5a5", glow: 1 };
+
+    
+    case "friend_white":
+      return {
+        ch: "@",
+        color: "#ffffff",
+        glow: 2
+      };
+
+    case "eeyore_hoof":
+      return {
+        ch: "#",
+        color: "#887d82",
+        glow: 0
+      };
+
+    case "eeyore_mane":
+      return {
+        ch: "#",
+        color: "#292524",
+        glow: 0
+      };
+
+    case "tigger_ear":
+      return {
+        ch: "@",
+        color: "#f9a8a8",
+        glow: 1
+      };
+
+    case "friend_dark":
+      return { ch: "@", color: "#292524", glow: 0 };
+    
     default: return { ch: ".", color: "#cbd5e1", glow: 0 };
 
     
@@ -1204,6 +2152,7 @@ btnReplay.addEventListener("click", () => {
   santaActive = false;
   santaProgress = 0;
   santaAutoTriggered = false;
+  christmasTitle?.classList.remove("show");
 });
 
 btnSanta.addEventListener("click", () => {
@@ -1211,21 +2160,43 @@ btnSanta.addEventListener("click", () => {
   santaProgress = 0;
 });
 
-btnSnoopy.addEventListener("click", () => {
-  snoopyEnabled = !snoopyEnabled;
-
-  btnSnoopy.textContent = snoopyEnabled
-    ? "Snoopy: ON"
-    : "Snoopy: OFF";
+// Open/close the character picker.
+btnCharacters.addEventListener("click", (event) => {
+  event.stopPropagation();
+  const isOpen = characterMenu.classList.toggle("is-open");
+  btnCharacters.setAttribute("aria-expanded", String(isOpen));
 });
 
-// Winnie the Pooh and Piglet toggle
-btnPooh.addEventListener("click", () => {
-  poohEnabled = !poohEnabled;
+// Each checkbox controls one character (Snoopy and Woodstock move together).
+characterMenu.addEventListener("change", (event) => {
+  const checkbox = event.target.closest("input[data-character]");
+  if (!checkbox) return;
 
-  btnPooh.textContent = poohEnabled
-    ? "Pooh & Piglet: ON"
-    : "Pooh & Piglet: OFF";
+  const character = checkbox.dataset.character;
+  if (checkbox.checked) {
+    selectedCharacters.add(character);
+  } else {
+    selectedCharacters.delete(character);
+  }
+
+  btnCharacters.textContent = selectedCharacters.size
+    ? `Pop Characters (${selectedCharacters.size})`
+    : "Pop Characters";
+});
+
+// Close the picker when the user clicks elsewhere or presses Escape.
+document.addEventListener("click", (event) => {
+  if (!characterMenu.contains(event.target) && !btnCharacters.contains(event.target)) {
+    characterMenu.classList.remove("is-open");
+    btnCharacters.setAttribute("aria-expanded", "false");
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    characterMenu.classList.remove("is-open");
+    btnCharacters.setAttribute("aria-expanded", "false");
+  }
 });
 
 btnSnow.addEventListener("click", () => {
@@ -1381,6 +2352,9 @@ function render(now) {
       };
     }
   }
+  if (christmasTitle) {
+    christmasTitle.classList.toggle("show", buildProgress >= 1);
+  }
 
   let visibleCount = 0;
   for (let i = 0; i < staticVoxels.length; i++) {
@@ -1391,23 +2365,43 @@ function render(now) {
     }
   }
 
-// Render Snoopy only when enabled
-    if (snoopyEnabled) {
+// Render Snoopy and Woodstock when selected.
+  if (selectedCharacters.has("snoopy")) {
     const snoopyVoxels = getSnoopyAndWoodstockVoxels(elapsed);
-
     for (let i = 0; i < snoopyVoxels.length; i++) {
-        projectAndPlot(snoopyVoxels[i], false);
+      projectAndPlot(snoopyVoxels[i], false);
     }
-    }
+  }
 
-    // Render Pooh and Piglet only when enabled
-    if (poohEnabled) {
-    const poohAndPigletVoxels = getPoohAndPigletVoxels(elapsed);
-
-        for (let i = 0; i < poohAndPigletVoxels.length; i++) {
-            projectAndPlot(poohAndPigletVoxels[i], false);
-        }
+  // Pooh and Piglet can be selected independently.
+  const showPooh = selectedCharacters.has("pooh");
+  const showPiglet = selectedCharacters.has("piglet");
+  if (showPooh || showPiglet) {
+    const poohAndPigletVoxels = getPoohAndPigletVoxels(
+      elapsed,
+      showPooh,
+      showPiglet
+    );
+    for (let i = 0; i < poohAndPigletVoxels.length; i++) {
+      projectAndPlot(poohAndPigletVoxels[i], false);
     }
+  }
+
+  // Render only the Hundred Acre Wood friends that are selected.
+  if (
+    selectedCharacters.has("tigger") ||
+    selectedCharacters.has("eeyore") ||
+    selectedCharacters.has("kanga") ||
+    selectedCharacters.has("roo")
+  ) {
+    const friendVoxels = getHundredAcreFriendsVoxels(
+      elapsed,
+      selectedCharacters
+    );
+    for (let i = 0; i < friendVoxels.length; i++) {
+      projectAndPlot(friendVoxels[i], false);
+    }
+  }
 
   if (santaActive) {
     const santaVoxels = getSantaVoxels(santaProgress, elapsed);

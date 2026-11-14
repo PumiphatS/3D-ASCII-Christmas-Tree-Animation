@@ -188,3 +188,129 @@ button#btn-santa:hover {
     border-radius: 16px;
   }
 }
+
+/* Character picker popup */
+.character-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#btn-characters[aria-expanded="true"] {
+  background: #166534;
+  border-color: #4ade80;
+}
+
+.character-menu {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  transform: translate(-50%, 8px);
+  width: 230px;
+  padding: 12px;
+  display: none;
+  flex-direction: column;
+  gap: 9px;
+  color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  z-index: 20;
+}
+
+.character-menu.is-open {
+  display: flex;
+  transform: translate(-50%, 0);
+}
+
+.character-menu-title {
+  padding-bottom: 7px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  color: #facc15;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.character-menu label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  color: #e2e8f0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.character-menu input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #22c55e;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .character-menu {
+    left: 0;
+    transform: translate(0, 8px);
+  }
+
+  .character-menu.is-open {
+    transform: translate(0, 0);
+  }
+}
+
+.christmas-title {
+  position: fixed;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(650px, 85vw);
+  z-index: 20;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 1.2s ease,
+    visibility 1.2s;
+}
+
+.christmas-title.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.christmas-title svg {
+  width: 100%;
+  overflow: visible;
+}
+
+.christmas-letters {
+  font-family: "Courier New", monospace;
+  font-size: 35px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  fill: #ffe59a;
+  stroke: #fff2b8;
+  stroke-width: 0.3px;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 12px #ffd700)
+    drop-shadow(0 0 22px #ffb700);
+  animation: christmasShine 3s ease-in-out infinite alternate;
+}
+
+@keyframes christmasShine {
+  from {
+    fill: #f6c85d;
+    filter: drop-shadow(0 0 5px #ffc84a);
+  }
+  to {
+    fill: #fff9d4;
+    filter: drop-shadow(0 0 9px #ffffff) drop-shadow(0 0 22px #ffd700);
+  }
+}

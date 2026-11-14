@@ -9,6 +9,24 @@
   <body>
     <canvas id="scene"></canvas>
 
+    <div id="christmas-title" class="christmas-title">
+      <svg viewBox="0 0 600 170">
+        <defs>
+          <path id="christmas-curve" d="M 35 145 Q 300 -45 565 145" />
+        </defs>
+
+        <text class="christmas-letters">
+          <textPath
+            href="#christmas-curve"
+            startOffset="50%"
+            text-anchor="middle"
+          >
+            ✦ MERRY CHRISTMAS ✦
+          </textPath>
+        </text>
+      </svg>
+    </div>
+
     <div class="logo-corner">
       <div class="logo-title">MERRY CHRISTMAS</div>
       <div class="hud-stats" id="hud-stats">t: 0.00s | voxels: 0 | rot: 0°</div>
@@ -30,8 +48,39 @@
     <div class="controls">
       <button id="btn-replay">Replay Build</button>
       <button id="btn-santa">Santa Flyby</button>
-      <button id="btn-snoopy">Snoopy: OFF</button>
-      <button id="btn-pooh">Pooh & Piglet: OFF</button>
+      <div class="character-picker">
+        <button
+          id="btn-characters"
+          type="button"
+          aria-expanded="false"
+          aria-controls="character-menu"
+        >
+          Pop Characters
+        </button>
+
+        <div class="character-menu" id="character-menu">
+          <div class="character-menu-title">Choose your characters</div>
+          <label
+            ><input type="checkbox" data-character="snoopy" /> Snoopy &
+            Woodstock</label
+          >
+          <label
+            ><input type="checkbox" data-character="pooh" /> Winnie the
+            Pooh</label
+          >
+          <label
+            ><input type="checkbox" data-character="piglet" /> Piglet</label
+          >
+          <label
+            ><input type="checkbox" data-character="tigger" /> Tigger</label
+          >
+          <label
+            ><input type="checkbox" data-character="eeyore" /> Eeyore</label
+          >
+          <label><input type="checkbox" data-character="kanga" /> Kanga</label>
+          <label><input type="checkbox" data-character="roo" /> Roo</label>
+        </div>
+      </div>
       <button id="btn-snow">Snow: ON</button>
 
       <div class="song-selector">
